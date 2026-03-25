@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BERLIN QUEST – Das Lobbyismus-Spiel</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+:root{
+  --bg:#0a0a1a;--panel:#12122a;--border:#3a3a6a;--gold:#f0c040;--green:#40c040;
+  --red:#c04040;--blue:#4080f0;--cyan:#40d0f0;--white:#e0e0f0;--gray:#606080;
+  --orange:#f08040;--purple:#a040f0;
+}
+*{box-sizing:border-box;margin:0;padding:0;image-rendering:pixelated;}
+body{background:var(--bg);color:var(--white);font-family:'Press Start 2P',monospace;
+  font-size:10px;line-height:1.8;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;padding:20px;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);
+  pointer-events:none;z-index:9999;}
+#game-container{width:100%;max-width:860px;}
+@keyframes flicker{0%,95%,100%{opacity:1;}96%{opacity:.8;}97%{opacity:1;}98%{opacity:.7;}}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-4px);}40%{transform:translateX(4px);}60%{transform:translateX(-4px);}80%{transform:translateX(2px);}}
+@keyframes glow{0%,100%{box-shadow:4px 4px 0 #000;}50%{box-shadow:4px 4px 0 #000,0 0 20px var(--gold);}}
+.pixel-title{font-size:20px;color:var(--gold);text-shadow:4px 4px 0 #804000;margin-bottom:8px;animation:flicker 3s infinite;}
+.pixel-subtitle{font-size:10px;color:var(--cyan);margin-bottom:24px;}
+.panel{background:var(--panel);border:3px solid var(--border);
+  box-shadow:4px 4px 0 #000,inset 0 0 0 1px rgba(255,255,255,.04);
+  padding:20px;margin-bottom:16px;position:relative;}
+.panel-title{font-size:11px;color:var(--gold);margin-bottom:16px;padding-bottom:8px;
+  border-bottom:2px solid var(--border);text-shadow:2px 2px 0 #604000;}
+#stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.stat-box{background:var(--panel);border:2px solid var(--border);padding:10px 8px;text-align:center;box-shadow:3px 3px 0 #000;}
+.stat-label{font-size:7px;color:var(--gray);margin-bottom:6px;display:block;}
+.stat-value{font-size:14px;display:block;}
+.stat-bar-wrap{width:100%;height:8px;background:#1a1a3a;border:1px solid var(--border);margin-top:6px;overflow:hidden;}
+.stat-bar-fill{height:100%;transition:width .5s steps(10);}
+.dialogue-box{background:#080818;border:3px solid var(--gold);
+  box-shadow:4px 4px 0 #000,0 0 20px rgba(240,192,64,.15);padding:16px;position:relative;margin-bottom:16px;}
+.dialogue-box::after{content:'▼';position:absolute;bottom:8px;right:12px;color:var(--gold);
+  font-size:8px;animation:blink 1s steps(1) infinite;}
+.dialogue-speaker{font-size:9px;color:var(--cyan);margin-bottom:10px;}
+.dialogue-text{font-size:9px;color:var(--white);line-height:2;min-height:60px;}
+.choices{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
+.choice-btn{background:#0a0a1a;border:2px solid var(--border);color:var(--white);
+  font-family:'Press Start 2P',monospace;font-size:9px;padding:12px 16px;text-align:left;
+  cursor:pointer;transition:all .1s steps(1);box-shadow:3px 3px 0 #000;display:flex;
+  align-items:flex-start;gap:10px;line-height:1.8;}
+.choice-btn:hover{background:#1a1a3a;border-color:var(--gold);color:var(--gold);box-shadow:4px 4px 0 #000;transform:translate(-1px,-1px);}
+.choice-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000;}
+.choice-prefix{color:var(--gold);flex-shrink:0;font-size:11px;margin-top:2px;}
+.consequence-box{border:2px solid;padding:14px;margin-top:12px;font-size:9px;line-height:2;box-shadow:3px 3px 0 #000;}
+.consequence-good{border-color:var(--green);background:rgba(64,192,64,.08);color:var(--green);}
+.consequence-bad{border-color:var(--red);background:rgba(192,64,64,.08);color:var(--red);}
+.consequence-neutral{border-color:var(--orange);background:rgba(240,128,64,.08);color:var(--orange);}
+.pixel-btn{background:var(--blue);border:none;border-bottom:4px solid #1040a0;border-right:4px solid #1040a0;
+  color:var(--white);font-family:'Press Start 2P',monospace;font-size:10px;padding:14px 24px;
+  cursor:pointer;box-shadow:3px 3px 0 #000;transition:all .1s steps(1);display:inline-block;margin:8px 4px;}
+.pixel-btn:hover{background:#5090ff;transform:translate(-1px,-1px);box-shadow:4px 4px 0 #000;}
+.pixel-btn:active{transform:translate(3px,3px);border-bottom-width:1px;border-right-width:1px;box-shadow:none;}
+.pixel-btn.gold{background:var(--gold);border-color:#804000;color:#000;}
+.pixel-btn.green{background:var(--green);border-color:#106010;color:#000;}
+.pixel-btn.red{background:var(--red);border-color:#601010;}
+.pixel-btn.purple{background:var(--purple);border-color:#601090;}
+.map-container{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.map-location{background:var(--panel);border:2px solid var(--border);padding:16px 8px;
+  text-align:center;cursor:pointer;box-shadow:3px 3px 0 #000;transition:all .1s steps(1);position:relative;}
+.map-location:hover{border-color:var(--gold);transform:translate(-1px,-1px);box-shadow:4px 4px 0 #000;}
+.map-location.completed{border-color:var(--green);opacity:.7;}
+.map-location.completed::after{content:'✓';position:absolute;top:4px;right:6px;color:var(--green);font-size:12px;}
+.location-icon{font-size:26px;margin-bottom:8px;display:block;}
+.location-name{font-size:8px;color:var(--cyan);line-height:1.6;}
+.location-lobby{font-size:7px;color:var(--gray);margin-top:4px;}
+.info-card{background:rgba(64,128,240,.1);border:2px solid var(--blue);padding:12px;
+  margin:10px 0;font-size:8px;line-height:2;color:var(--cyan);box-shadow:2px 2px 0 #000;}
+.info-card .info-title{color:var(--gold);font-size:9px;margin-bottom:8px;display:block;}
+.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.score-item{background:var(--panel);border:2px solid var(--border);padding:14px;text-align:center;box-shadow:3px 3px 0 #000;}
+.score-label{font-size:8px;color:var(--gray);margin-bottom:8px;display:block;}
+.score-val{font-size:20px;}
+.pixel-divider{width:100%;height:4px;background:repeating-linear-gradient(90deg,var(--border) 0,var(--border) 8px,transparent 8px,transparent 16px);margin:16px 0;}
+.stars{color:var(--gold);font-size:14px;letter-spacing:4px;}
+.hidden{display:none!important;}
+.char-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0;}
+.char-card{background:var(--panel);border:3px solid var(--border);padding:16px 10px;
+  text-align:center;cursor:pointer;box-shadow:4px 4px 0 #000;transition:all .1s steps(1);}
+.char-card:hover{border-color:var(--gold);transform:translate(-2px,-2px);box-shadow:6px 6px 0 #000;}
+.char-card.selected{border-color:var(--gold);background:#1a1a10;animation:glow 2s infinite;}
+.char-name{font-size:9px;margin:10px 0 4px;}
+.char-job{font-size:7px;color:var(--gray);margin-bottom:6px;}
+.char-trait{font-size:7px;color:var(--cyan);line-height:1.8;}
+.char-bonus{font-size:7px;color:var(--green);margin-top:6px;}
+canvas{display:block;image-rendering:pixelated;}
+.npc-row{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px;}
+.npc-bio-box{flex:1;}
+.npc-name-txt{font-size:10px;color:var(--gold);margin-bottom:4px;}
+.npc-role-txt{font-size:8px;color:var(--gray);line-height:1.8;margin-bottom:8px;}
+.npc-bio-txt{font-size:8px;color:var(--cyan);line-height:2;background:rgba(64,128,240,.08);
+  border:1px solid var(--border);padding:8px;}
+/* EPILOGUE */
+.epilogue-scene{background:var(--panel);border:3px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:4px 4px 0 #000;}
+.epilogue-icon{font-size:48px;text-align:center;display:block;margin:16px 0;}
+.epilogue-headline{font-size:11px;margin-bottom:12px;padding:8px;text-align:center;border:2px solid;}
+.interview-q{font-size:9px;color:var(--orange);margin:12px 0 6px;line-height:2;}
+.interview-a{font-size:9px;color:var(--white);margin-bottom:12px;line-height:2;
+  padding:8px;background:rgba(255,255,255,.04);border-left:3px solid var(--border);}
+/* KNOWLEDGE */
+.know-section{margin-bottom:24px;}
+.know-heading{font-size:11px;color:var(--gold);padding:10px 12px;background:rgba(240,192,64,.1);
+  border-left:4px solid var(--gold);margin-bottom:12px;}
+.know-term{background:rgba(64,128,240,.08);border:2px solid var(--blue);padding:12px;margin-bottom:10px;}
+.know-term-name{font-size:9px;color:var(--cyan);margin-bottom:6px;display:block;}
+.know-def{font-size:8px;color:var(--white);line-height:2;}
+.know-example{font-size:7px;color:var(--gray);margin-top:6px;border-top:1px solid var(--border);padding-top:6px;line-height:1.8;}
+.know-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:8px;}
+.know-table th{background:rgba(240,192,64,.15);color:var(--gold);padding:8px;border:1px solid var(--border);text-align:left;}
+.know-table td{color:var(--white);padding:8px;border:1px solid var(--border);line-height:1.8;}
+.know-table tr:nth-child(even) td{background:rgba(255,255,255,.03);}
+.stats-trio{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0;}
+.stat-card{background:var(--panel);border:2px solid var(--border);padding:14px;text-align:center;box-shadow:2px 2px 0 #000;}
+.stat-big{font-size:18px;color:var(--gold);display:block;margin-bottom:4px;}
+.stat-lbl{font-size:7px;color:var(--gray);}
+.quiz-wrap{margin:16px 0;}
+.quiz-q{font-size:9px;color:var(--white);margin-bottom:10px;line-height:2;}
+.quiz-opt{background:rgba(64,128,240,.1);border:2px solid var(--blue);color:var(--cyan);
+  font-family:'Press Start 2P',monospace;font-size:8px;padding:10px;width:100%;text-align:left;
+  cursor:pointer;margin-bottom:6px;transition:all .1s steps(1);}
+.quiz-opt:hover{background:rgba(64,128,240,.25);}
+.quiz-opt.correct{background:rgba(64,192,64,.2);border-color:var(--green);color:var(--green);}
+.quiz-opt.wrong{background:rgba(192,64,64,.2);border-color:var(--red);color:var(--red);}
+.quiz-feedback{font-size:8px;padding:10px;margin-top:8px;border:2px solid;line-height:2;}
+#notification{position:fixed;top:20px;right:20px;background:var(--panel);border:3px solid var(--gold);
+  padding:12px 16px;font-size:9px;color:var(--gold);box-shadow:4px 4px 0 #000;z-index:1000;
+  display:none;max-width:260px;line-height:1.8;}
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border:2px solid var(--bg);}
+/* GLOSSARY MODAL */
+#glossary-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.85);z-index:10000;overflow-y:auto;padding:20px;}
+#glossary-overlay.open{display:block;}
+#glossary-box{background:var(--panel);border:3px solid var(--gold);max-width:700px;
+  margin:0 auto;padding:24px;box-shadow:6px 6px 0 #000,0 0 40px rgba(240,192,64,.2);}
+#glossary-box .gtitle{font-size:13px;color:var(--gold);margin-bottom:4px;text-shadow:2px 2px 0 #804000;}
+#glossary-box .gsub{font-size:8px;color:var(--gray);margin-bottom:20px;}
+.g-search{width:100%;background:#080818;border:2px solid var(--border);color:var(--white);
+  font-family:'Press Start 2P',monospace;font-size:9px;padding:10px;margin-bottom:16px;
+  outline:none;}
+.g-search:focus{border-color:var(--gold);}
+.g-search::placeholder{color:var(--gray);}
+.g-letter{font-size:9px;color:var(--gold);margin:16px 0 8px;padding-bottom:4px;
+  border-bottom:2px solid var(--border);}
+.g-term{margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,.03);
+  border-left:3px solid var(--border);transition:border-color .1s;}
+.g-term:hover{border-left-color:var(--gold);}
+.g-term-name{font-size:9px;color:var(--cyan);margin-bottom:5px;display:block;}
+.g-term-def{font-size:8px;color:var(--white);line-height:2;}
+.g-term-ex{font-size:7px;color:var(--gray);margin-top:5px;line-height:1.8;
+  border-top:1px solid var(--border);padding-top:5px;}
+.g-term.highlight{border-left-color:var(--gold);background:rgba(240,192,64,.06);}
+#g-close-btn{background:var(--red);border:none;border-bottom:3px solid #601010;
+  border-right:3px solid #601010;color:#fff;font-family:'Press Start 2P',monospace;
+  font-size:9px;padding:10px 20px;cursor:pointer;box-shadow:2px 2px 0 #000;margin-top:16px;}
+#g-close-btn:hover{background:#d05050;}
+/* Floating glossary button – always visible */
+#glossary-fab{position:fixed;bottom:24px;right:24px;z-index:9000;
+  background:var(--purple);border:none;border-bottom:4px solid #601090;
+  border-right:4px solid #601090;color:#fff;font-family:'Press Start 2P',monospace;
+  font-size:8px;padding:10px 14px;cursor:pointer;box-shadow:3px 3px 0 #000;
+  transition:all .1s steps(1);}
+#glossary-fab:hover{background:#b050f0;transform:translate(-1px,-1px);box-shadow:4px 4px 0 #000;}
+#glossary-fab:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000;}
+</style>
+</head>
+<body>
+<div id="notification"></div>
+
+<!-- FLOATING GLOSSARY BUTTON -->
+
+<button id="glossary-fab" onclick="openGlossary()">📖 GLOSSAR</button>
+
+<!-- GLOSSARY MODAL -->
+
+<div id="glossary-overlay">
+  <div id="glossary-box">
+    <div class="gtitle">📖 FACHBEGRIFF-GLOSSAR</div>
+    <div class="gsub">Lobbyismus · Politik · Demokratie – SoWi EF NRW</div>
+    <input class="g-search" id="g-search" type="text" placeholder="Begriff suchen..." oninput="filterGlossary(this.value)">
+    <div id="g-entries"></div>
+    <div style="text-align:center;">
+      <button id="g-close-btn" onclick="closeGlossary()">✕ SCHLIESSEN</button>
+    </div>
+  </div>
+</div>
+<div id="screen-title"></div>
+<div id="screen-charselect" class="hidden"></div>
+<div id="screen-intro" class="hidden"></div>
+<div id="screen-map" class="hidden"></div>
+<div id="screen-scenario" class="hidden"><div id="scenario-content"></div></div>
+<div id="screen-result" class="hidden"><div id="result-content"></div></div>
+<div id="screen-epilogue" class="hidden"><div id="epilogue-content"></div></div>
+<div id="screen-final" class="hidden"><div id="final-content"></div></div>
+<div id="screen-knowledge" class="hidden"><div id="knowledge-content"></div></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// PIXEL ART ENGINE
+// ═══════════════════════════════════════════════════
+const SC=6;
+function drawSprite(cv,grid,pal){
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  grid.forEach((row,y)=>[...row].forEach((c,x)=>{
+    if(c!=='.'&&pal[c]){ctx.fillStyle=pal[c];ctx.fillRect(x*SC,y*SC,SC,SC);}
+  }));
+}
+function mkCV(sprite,px){
+  const cv=document.createElement('canvas');
+  const sz=px*SC;
+  cv.width=sz;cv.height=sz;
+  cv.style.cssText=`width:${sz}px;height:${sz}px;border:3px solid var(--border);box-shadow:4px 4px 0 #000;display:block;`;
+  drawSprite(cv,sprite.grid,sprite.palette);
+  return cv;
+}
+
+// ═══════════════════════════════════════════════════
+// CHARACTERS
+// ═══════════════════════════════════════════════════
+const CHARS=[
+  {id:'jana',name:'JANA WEBER',job:'Juristin, 28 · SPD · Köln-Nord',
+   trait1:'Idealistin',trait2:'Prinzipientreu',trait3:'Bürgernah',
+   bonus:'Integrität +20',backstory:'Jana kämpfte als Pflichtverteidigerin für Gerechtigkeit. Sie gewann ihr Direktmandat mit 31,2% – als Überraschungskandidatin gegen den alten Platzhirsch. Berlin wird sie auf die Probe stellen.',
+   startI:120,startF:10,color:'#f0c040',
+   palette:{S:'#f5d0a0',H:'#2a0a0a',h:'#4a1a0a',E:'#2060b0',L:'#e04060',B:'#2050c0',b:'#1040a0',W:'#f0f0f0',N:'#e8c090',G:'#f0c040',C:'#40c0d0',K:'#d0d0d0',P:'#f080a0',T:'#ffffff',R:'#e04060'},
+   grid:['................','................','....HHHHHHHH....','...HhhhhhhhHH...','...HSSSSSSSH....','...HSEhSSEhSH...','...HSSSSSSSH....','...HSSLLSSSH....','....HNNNNNH.....','....CGGGGGC.....','....BBTWWTBB....','...BBBTWWTBBB...','...BBBTWWTBBB...','...SBBBBBBBS....','....SSSSSSSS....','................']},
+  {id:'max',name:'MAX SCHNEIDER',job:'Ex-Journalist, 35 · FDP · Frankfurt-West',
+   trait1:'Pragmatiker',trait2:'Vernetzt',trait3:'Clever',
+   bonus:'Einfluss +20',backstory:'Max berichtete 8 Jahre für die FAZ über Lobbyismus. Dann kandidierte er selbst – aus Frustration oder Kalkül? Das weiß er manchmal selbst nicht mehr.',
+   startI:90,startF:30,color:'#40d0f0',
+   palette:{S:'#d4a870',H:'#1a1a1a',h:'#2a2a2a',E:'#3a8030',L:'#b05040',B:'#303030',b:'#202020',W:'#e8e8e8',N:'#c49860',G:'#40d0f0',T:'#808080',C:'#40d0f0',K:'#d0d0d0',P:'#c0c0c0',R:'#c04040'},
+   grid:['................','................','....HHHHHHHH....','...HhHHHHhHHH...','...HSSSSSSSH....','...HSEhSSEhSH...','...HSSSSSSSH....','...HSS LS SSH...','....HKNNKNH.....','....CTTTTTC.....','....BBTWWTBB....','...BBBTWWTBBB...','...BbbTWWTbbB...','...SBbbBBbbBS...','....SSSSSSSS....','................']},
+  {id:'sara',name:'SARA YILMAZ',job:'Lehrerin & Aktivistin, 31 · Grüne · Berlin-Neukölln',
+   trait1:'Unbestechlich',trait2:'Kampfbereit',trait3:'Transparent',
+   bonus:'Integrität +30',backstory:'Sara organisierte Schülerstreiks, gründete eine Lobbyismus-Transparenz-NGO und gewann das Mandat völlig unerwartet. Die Industrie hat sie bereits auf der roten Liste.',
+   startI:130,startF:5,color:'#40c040',
+   palette:{S:'#c8845a',H:'#0a0a0a',h:'#1a0808',E:'#2a1a08',L:'#c03a3a',B:'#206040',b:'#104030',W:'#f0f0f0',N:'#b87050',G:'#40c040',T:'#208050',C:'#40c040',K:'#d0d0d0',P:'#80c060',R:'#c04040'},
+   grid:['................','................','....HHHHHHHH....','...HHhhhhhHHH...','...HSSSSSSSH....','...HSEhSSEhSH...','...HSSSSSSSH....','...HSSLLSSSH....','....HPNNPH......','....CTTTTTC.....','....BBTWWTBB....','...BBBTWWTBBB...','...BbbTWWTbbB...','...SGbbBBbbGS...','....SSSSSSSS....','................']}
+];
+
+// ═══════════════════════════════════════════════════
+// NPC SPRITES
+// ═══════════════════════════════════════════════════
+const NPCS={
+  hartmann:{name:'DR. HARTMANN',role:'Cheflobbyist · Gasverband Deutschland',
+    bio:'38 Jahre Energiebranche. Ex-Staatssekretär im Wirtschaftsministerium. Kennt 200 Abgeordnete persönlich. Jahresgehalt: 380.000 €. Budgethoheit: 820.000 €/Jahr für Lobbying.',
+    palette:{S:'#e8c8a0',H:'#888870',h:'#606050',E:'#2a4a80',L:'#b06050',B:'#101030',b:'#08081a',W:'#d0d0d0',N:'#d8b880',G:'#d0b020',T:'#c0a000',C:'#1a1a3a',K:'#e0e0e0',P:'#404060',R:'#c04040'},
+    grid:['................','................','....HHHHHHHH....','...HHhHHHhHHH...','...HSSSSSSSH....','...HSEhSSEhSH...','...HSSSSSSSH....','...HSS LS SSH...','....HGNNGH......','....CTTTTC......','....BBTWWTBB....','...BBbTWWTbBB...','...BBbTWWTbBB...','...SBBbBBbBBS...','....SSSSSSSS....','................']},
+  fischer:{name:'DR. ELENA FISCHER',role:'VP Public Affairs · PharmaDeutsch GmbH',
+    bio:'Promovierte Pharmakologin, wechselte 2015 von der Uni in die Industrie. Drehtür-Prinzip in Reinform. Gehalt: 290.000 €. Hat direkten Zugang zu 12 Ministerien.',
+    palette:{S:'#f0d0b0',H:'#c07840',h:'#a05820',E:'#408050',L:'#e06060',B:'#b0b0b0',b:'#909090',W:'#f8f8f8',N:'#e0c090',G:'#e040a0',T:'#d030a0',C:'#c050a0',K:'#ffffff',P:'#e080b0',R:'#c04040'},
+    grid:['................','................','....hHHHHHHh....','...HhhhhhhhHH...','...HSSSSSSSH....','...HSEhSSEhSH...','...HSSSSSSSH....','...HSSLLSSSH....','....HPNNPH......','....CTTTTTC.....','....BBKWWKBB....','...BBbKWWKbBB...','...BbbKWWKbbB...','...SBbbGGbbBS...','....SSSSSSSS....','................']},
+  bremer:{name:'GENERAL A.D. BREMER',role:'Sicherheitsberater · RheinMetall Partners',
+    bio:'32 Jahre Bundeswehr, Brigadegeneral a.D. Seit 2019 Rüstungslobbyist. Verdient heute das Dreifache seiner Pension. Kontakte zu 23 MdBs im Verteidigungsausschuss.',
+    palette:{S:'#d4a870',H:'#404030',h:'#303020',E:'#303020',L:'#a05040',B:'#3a4a2a',b:'#2a3a1a',W:'#b0b090',N:'#c49860',G:'#c0a020',T:'#a08010',C:'#505040',K:'#d0c090',P:'#808060',R:'#c04040'},
+    grid:['................','................','....HHHHHHHH....','...HHhHHHhHHH...','...HSSSSSSSH....','...HSEhSSEhSH...','...HSSSSSSSH....','...HSSLLSSSH....','....HGNNGH......','....CRRRGC......','....BBWKKWBB....','...GBbWKKWbBG...','...GBbWKKWbBG...','...SGBbBBbBGS...','....SSSSSSSS....','................']},
+  vonstein:{name:'MAXIMILIAN VON STEIN',role:'Head of Gov. Relations · Deutsche Großbank AG',
+    bio:'Dritte Bankiersgeneration, Harvard MBA. Budget: 4,2 Mio. €/Jahr für Lobbying. Verbringt mehr Zeit in Berlin als in Frankfurt. Parteispenden 2021: 380.000 €.',
+    palette:{S:'#f0d4b0',H:'#080808',h:'#181818',E:'#3a2a10',L:'#c05040',B:'#080808',b:'#101010',W:'#f8f8f8',N:'#e0c490',G:'#d0a820',T:'#c04040',C:'#282828',K:'#f0f0f0',P:'#e8e8e8',R:'#c04040'},
+    grid:['................','................','....HHHHHHHH....','...HHhHHHhHHH...','...HSSSSSSSH....','...HSEhSSEhSH...','...HSSSSSSSH....','...HSS LS SSH...','....HGNNGH......','....CTTTTC......','....BBKWWKBB....','...bBbKWWKbBb...','...bBbKWWKbBb...','...SbBbBBbBbS...','....SSSSSSSS....','................']},
+  bright:{name:'SARAH BRIGHT',role:'EU Policy Lead · MetaSphere',
+    bio:'Ex-Google, Stanford-Absolventin, 29 Jahre. Vertritt einen Konzern mit 3 Mrd. € EU-Jahresgewinn. Lobbying-Budget EU: 8,2 Mio. €/Jahr. Ihr Titel klingt harmlos – ihr Einfluss nicht.',
+    palette:{S:'#f8e0c0',H:'#e8a050',h:'#c08030',E:'#4080d0',L:'#e87060',B:'#2860d0',b:'#1850b0',W:'#f0f8ff',N:'#f0c890',G:'#20c0d0',T:'#10a0b0',C:'#2090c0',K:'#e0f0ff',P:'#60b0e0',R:'#c04040'},
+    grid:['................','................','....hHHHHHHh....','...HHhhhhhHHH...','...HSSSSSSSH....','...HSEhSSEhSH...','...HSSSSSSSH....','...HSSLLSSSH....','....HCNNCH......','....CTTTTTC.....','....BBKWWKBB....','...BbBKWWKBbB...','...BbBKWWKBbB...','...SBbBBBBbBS...','....SSSSSSSS....','................']},
+  journalist:{name:'LENA KRAFT',role:'Investigativjournalistin · DER SPIEGEL',
+    bio:'Pulitzer-Preis-nominiert. Spezialisiert auf Lobbying-Skandale. Ihre Artikel haben 3 Minister zum Rücktritt gebracht. Jetzt sitzt sie dir gegenüber.',
+    palette:{S:'#e8c090',H:'#c04020',h:'#a03010',E:'#4a3a20',L:'#c05040',B:'#202060',b:'#101040',W:'#f0f0f0',N:'#d8a870',G:'#e0a020',T:'#c04040',C:'#2040a0',K:'#e0e0f0',P:'#8080d0',R:'#c04040'},
+    grid:['................','................','....hHHHHHHh....','...HhhhhhhhHH...','...HSSSSSSSH....','...HSEhSSEhSH...','...HSSSSSSSH....','...HSSLLSSSH....','....HGNNGH......','....CTTTTTC.....','....BBKWWKBB....','...BBbKWWKbBB...','...BBbKWWKbBB...','...SBBbBBbBBS...','....SSSSSSSS....','................']},
+  wahl:{name:'WAHLKAMPFTEAM',role:'Dein Team für die Wiederwahl',
+    bio:'Vier junge Aktivisten, die für dich brennen. Kein Budget, viel Herzblut. Ob das reicht?',
+    palette:{S:'#e8c090',H:'#1a1a1a',h:'#2a2a2a',E:'#2060b0',L:'#e04060',B:'#c04040',b:'#a03030',W:'#f0f0f0',N:'#d8b880',G:'#f0c040',T:'#c04040',C:'#4080f0',K:'#ffffff',P:'#f0c040',R:'#c04040'},
+    grid:['................','................','....HHHHHHHH....','...HhhhhhhhHH...','...HSSSSSSSH....','...HSEhSSEhSH...','...HSSSSSSSH....','...HSSLLSSSH....','....HGNNGH......','....CTTTTTC.....','....BBTWWTBB....','...BBBTWWTBBB...','...BBBTWWTBBB...','...SBBBBBBBS....','....SSSSSSSS....','................']}
+};
+
+// ═══════════════════════════════════════════════════
+// LOCATIONS & SCENARIOS
+// ═══════════════════════════════════════════════════
+const LOCS=[
+  {id:'energy',name:'Wirtschafts-\nministerium',icon:'⚡',lobby:'Energielobby',color:'#f0c040',npcKey:'hartmann',
+   scenario:{title:'SZENARIO 1: DIE ENERGIELOBBY',
+     context:'KONTEXT: Nach dem Atom- und Kohleausstieg kämpft die Gasindustrie um Subventionen. Gas soll als „Brückentechnologie" gesetzlich verankert werden.',
+     realFact:'LOBBYREGISTER: Gasverband · 820.000 €/Jahr · 12 Vollzeit-Lobbyisten · Direktkontakte zu 34 MdBs in 2023 · 6 ehemalige Staatssekretäre im Beraterkreis',
+     setup:'Im Wirtschaftsministerium wartet Dr. Hartmann. Auf dem Tisch: ein Gesetzentwurf zur Gasinfrastruktur. Er bietet eine Informationsreise nach Norwegen an.',
+     dialogue:'„Schön, Sie kennenzulernen! Wir würden gerne eine Informationsreise nach Norwegen für Sie finanzieren – Besichtigung moderner Gasinfrastruktur, 5 Tage, alles inklusive. Völlig kostenlos. Rein informativ, natürlich."',
+     choices:[
+       {text:'Einladung ablehnen – transparente Politik bedeutet keine finanzierten Reisen.',
+        effect:{i:+10,f:+5,m:0},type:'good',
+        consequence:'✓ MUTIGE ENTSCHEIDUNG\nDu lehnst höflich aber klar ab und veröffentlichst es. NGOs loben dich. Der Gasverband macht einen roten Haken hinter deinen Namen – aber dein Ruf ist sauber.',
+        learn:'Laut AbgeordnetenWatch nahmen 2021 über 180 MdBs an finanzierten Reisen teil. Studien zeigen: 73% stimmten danach für Interessen der finanzierenden Branche.'},
+       {text:'Einladung annehmen – Informationen vor Ort sind wichtig für gute Gesetze.',
+        effect:{i:-20,f:+15,m:5000},type:'bad',
+        consequence:'✗ INTERESSENKONFLIKT\nDu fliegst nach Bergen, Luxushotel, Gourmetessen. Drei Monate später stimmst du gegen eine Gassteuer. AbgeordnetenWatch veröffentlicht die Verbindung. Shitstorm.',
+        learn:'"Informationsreisen" sind laut LobbyControl das meistgenutzte Lobbying-Instrument. Sie schaffen Verbundenheit ohne direkten Bestechungsvorwurf – aber mit klarem Effekt.'},
+       {text:'Gespräch führen, Einladung ablehnen – ich höre zu, entscheide selbst.',
+        effect:{i:+5,f:+10,m:0},type:'neutral',
+        consequence:'◆ AUSGEWOGEN\nDu diskutierst sachlich, lehnst die Reise schriftlich ab und dokumentierst den Kontakt im Lobbyregister. Das ist der professionelle Weg.',
+        learn:'Lobbyismus ist demokratisch legitim – Abgeordnete brauchen Expertise. Die Grenze liegt bei finanziellen Zuwendungen. Neutraler Informationsaustausch ist erlaubt und sinnvoll.'}
+     ]}},
+  {id:'pharma',name:'Bundestag-\nCafeteria',icon:'💊',lobby:'Pharmaindustrie',color:'#40d0f0',npcKey:'fischer',
+   scenario:{title:'SZENARIO 2: PHARMALOBBY',
+     context:'KONTEXT: Ein neues Alzheimer-Medikament wartet auf Zulassung. Preis: 85.000 €/Patient/Jahr. Die Krankenkassen zögern. PharmaDeutsch braucht politische Rückendeckung.',
+     realFact:'LOBBYREGISTER: vfa · 3,2 Mio. €/Jahr · Zugang zu 12 Ministerien · 6 Ex-Politiker im Konzern-Aufsichtsrat · Von 47 Studien zum Medikament: 44 konzernfinanziert',
+     setup:'Dr. Fischer erklärt das Medikament – und erwähnt dann beiläufig, dass PharmaDeutsch „erfahrene politische Berater" nach der Legislaturperiode suche.',
+     dialogue:'„Wir brauchen Abgeordnete, die schnelle Zulassungen für Patienten verstehen. Darf ich Ihnen unsere Studiendaten zeigen? Ach ja: Nach Ihrer Legislaturperiode suchen wir erfahrene Berater – ca. 200.000 € jährlich, flexible Arbeitszeiten..."',
+     choices:[
+       {text:'Nein – der Hinweis auf den Beraterjob ist ein klassisches Drehtür-Angebot.',
+        effect:{i:+15,f:+5,m:0},type:'good',
+        consequence:'✓ REVOLVING DOOR ERKANNT\nDas Drehtür-Prinzip: Eine lukrative Stelle nach dem Mandat schafft Loyalität schon vorher. Du erkennst es, lehnst ab und meldest das Gespräch formell.',
+        learn:'Von 2005-2022 wechselten 107 MdBs direkt nach dem Mandat in die Wirtschaft. Für Minister gilt seit 2015 eine Karenzzeit von 18 Monaten – für einfache Abgeordnete nicht.'},
+       {text:'Studiendaten ansehen – Branchenexpertise ist wichtig für Entscheidungen.',
+        effect:{i:-5,f:+20,m:0},type:'neutral',
+        consequence:'◆ EINSEITIGE INFORMATION\nDie Studien klingen überzeugend. Aber: Sie wurden alle vom Konzern finanziert. Der Wissenschaftliche Dienst des Bundestages kommt zu anderen Schlüssen.',
+        learn:'Konzernfinanzierte Studien kommen 5× häufiger zu positiven Ergebnissen als unabhängige (Cochrane Review 2020). Abgeordnete brauchen unabhängige Gegengutachten.'},
+       {text:'Gespräch abbrechen und beim Bundestagspräsidium melden.',
+        effect:{i:+20,f:-5,m:0},type:'good',
+        consequence:'✓ MAXIMALE INTEGRITÄT\nDu meldest das Gespräch formell. Das ist selten und mutig. Der Vorfall wird Teil der Lobbyismus-Debatte. Die Pharmaindustrie meidet dich fortan.',
+        learn:'Das 2022 eingeführte Lobbyregister verpflichtet Interessengruppen zur Registrierung. Meldepflichten für Abgeordnete bei verdächtigen Kontakten sind noch lückenhaft.'}
+     ]}},
+  {id:'defense',name:'Parlamenta-\nrisches Büro',icon:'🪖',lobby:'Rüstungsindustrie',color:'#a040f0',npcKey:'bremer',
+   scenario:{title:'SZENARIO 3: RÜSTUNGSLOBBY',
+     context:'KONTEXT: Das 100-Milliarden-Sondervermögen für die Bundeswehr muss vergeben werden. RheinMetall, Airbus und Co. kämpfen um Aufträge – und Abgeordnetengunst.',
+     realFact:'LOBBYREGISTER: BDSV · 12,3 Mio. € Parteispenden 2017-2021 · 23 MdBs mit Rüstungsverbindungen im Verteidigungsausschuss · RheinMetall Börsenkurs +400% seit 2022',
+     setup:'General a.D. Bremer wirbt für einen Waffenexport. Dann kommt das Angebot, das er vermutlich nicht zum ersten Mal macht.',
+     dialogue:'„Deutschland braucht starke Verteidigung – und unsere Partner brauchen Ausrüstung. Eine Spende an Ihren Wahlkampfverein – sagen wir 50.000 € – würde zeigen, dass Sie Sicherheitspolitik wirklich ernst nehmen..."',
+     choices:[
+       {text:'Ablehnen und Anzeige erstatten – das ist klar strafbar (§108e StGB).',
+        effect:{i:+25,f:-10,m:0},type:'good',
+        consequence:'✓ HALTUNG GEZEIGT\nDas Angebot ist Bestechung eines Mandatsträgers – strafbar bis 5 Jahre Haft. Du erstattest Anzeige. Der Fall wird öffentlich. Du wirst bekannt. Bremer schweigt.',
+        learn:'§108e StGB: Bestechung von Mandatsträgern – bis 5 Jahre Haft. Aber: Parteispenden bis 50.000 € müssen nicht sofort veröffentlicht werden. Diese Lücke wird systematisch genutzt.'},
+       {text:'Nachfragen – vielleicht ist eine Spende an den Wahlkampfverein ja legal?',
+        effect:{i:-30,f:+10,m:50000},type:'bad',
+        consequence:'✗ GEFÄHRLICHE GRAUZONE\nDie Spende kommt. Du stimmst beim Waffenexport zu. Zwei Jahre später: Der Spiegel und Correctiv decken die Verbindung auf. Karriereende.',
+        learn:'Transparency International: 2017-2021 flossen über 100 Mio. € Rüstungsgelder an Parteien. Viele Verbindungen sind legal – aber moralisch fragwürdig und demokratieschädlich.'},
+       {text:'Gespräch sachlich führen, Spende klar ablehnen.',
+        effect:{i:+5,f:+5,m:0},type:'neutral',
+        consequence:'◆ PROFESSIONELL\nDu diskutierst die Sicherheitspolitik sachlich, lehnst die Spende schriftlich ab. Bremer respektiert das halbwegs. Du kennst jetzt seine Argumentationsstrategien.',
+        learn:'Rüstungslobbyismus ist komplex: Nationale Sicherheit, wirtschaftliche Interessen und Exportrecht überschneiden sich. Unabhängige Sicherheitsexpertise ist hier besonders wichtig.'}
+     ]}},
+  {id:'finance',name:'Luxus-\nRestaurant',icon:'💰',lobby:'Finanzlobby',color:'#f08040',npcKey:'vonstein',
+   scenario:{title:'SZENARIO 4: FINANZLOBBY',
+     context:'KONTEXT: Eine Finanztransaktionssteuer (0,1% auf Aktien) soll Spekulation bremsen. Banken und Finanzlobby kämpfen mit allem dagegen.',
+     realFact:'LOBBYREGISTER: Bankenverband · 4,2 Mio. €/Jahr · Von 20 Studien zur Steuer im Finanzausschuss: 17 branchenfinanziert · "Regulatory Capture" gilt als Hauptproblem',
+     setup:'Von Stein hat im besten Berliner Restaurant reserviert. Er hat eine Studie dabei – und Argumente. Und ein sehr teures Fischgericht.',
+     dialogue:'„Die Finanztransaktionssteuer klingt harmlos – aber sie trifft Millionen Kleinanleger und ruiniert Deutschland als Finanzstandort! Hier, unsere Studie. Finanziert von uns, ja – aber die Zahlen stimmen, wirklich."',
+     choices:[
+       {text:'Studie hinterfragen: Wer finanziert sie? Was sagen unabhängige Ökonomen?',
+        effect:{i:+10,f:+10,m:0},type:'good',
+        consequence:'✓ QUELLENKRITIK\nDu fragst nach unabhängigen Studien. Das IMK und die EU-Kommission kommen zu anderen Schlüssen. Konzernfinanzierte Gutachten sind keine neutralen Fakten.',
+        learn:'Von 20 Studien zur Finanztransaktionssteuer im Finanzausschuss wurden 17 von der Finanzindustrie finanziert. Nur 3 kamen von unabhängigen Instituten. Das ist Regulatory Capture.'},
+       {text:'Studie akzeptieren – Expertise kommt nun mal aus der Branche.',
+        effect:{i:-15,f:+15,m:0},type:'bad',
+        consequence:'✗ REGULATORY CAPTURE\nDu stimmst auf Basis der Branchenstudie gegen die Steuer. Die Finanzlobby ist zufrieden. Später stellst du fest: Die „unabhängigen" Co-Autoren der Studie arbeiteten beim Bankenverband.',
+        learn:'"Regulatory Capture": Wenn Regulierte ihre Regulierer durch Expertise und Information kontrollieren. Das Ergebnis: Gesetze, die dem Allgemeinwohl schaden, aber Einzelinteressen nützen.'},
+       {text:'Das Abendessen ablehnen – schon der Ort sendet das falsche Signal.',
+        effect:{i:+15,f:-5,m:0},type:'good',
+        consequence:'✓ KONSEQUENT\nDu bittest um ein formelles Bürogespräch und lehnst das Dinner ab. Von Stein ist überrascht – das kommt selten vor. Aber du hast damit klare Grenzen gesetzt.',
+        learn:'Informelle Settings wie Abendessen, Golfplätze, Konzerteinladungen sind bewusste Lobbying-Instrumente. Sie schaffen Nähe und Dankbarkeit jenseits formeller Kanäle.'}
+     ]}},
+  {id:'tech',name:'Start-Up-\nHub Berlin',icon:'📱',lobby:'Tech & Social Media',color:'#40c040',npcKey:'bright',
+   scenario:{title:'SZENARIO 5: TECH-LOBBY',
+     context:'KONTEXT: Das Digitale-Dienste-Gesetz soll Algorithmen und Hassrede regulieren. Tech-Konzerne kämpfen dagegen mit dem Argument der Meinungsfreiheit.',
+     realFact:'LOBBYREGISTER: Meta · 8,2 Mio. €/Jahr (EU) · Google · 7,1 Mio. €/Jahr · Bei EU-KI-Gesetz: 200+ Tech-Lobbyisten vs. 40 Parlamentsmitarbeiter · 300 Änderungsanträge in 48 Stunden',
+     setup:'Sarah Bright lädt dich in einen hippen Co-Working-Space ein. Kein Anzug, kein Aktenkoffer – aber das Angebot ist dasselbe wie immer, nur freundlicher verpackt.',
+     dialogue:'„Zu viel Regulierung schadet Millionen Nutzerinnen und der Innovation! Wir würden dir exklusiven Datenzugang zu unserer Plattform anbieten – damit du fundierte Entscheidungen treffen kannst. Nur für dich, natürlich."',
+     choices:[
+       {text:'Ablehnen – Konzern-Datenzugang ist keine neutrale Informationsquelle.',
+        effect:{i:+10,f:+5,m:0},type:'good',
+        consequence:'✓ DIGITAL LITERACY\nWer die Daten kontrolliert, kontrolliert das Narrativ. Du beauftragst stattdessen den Wissenschaftlichen Dienst des Bundestages für eine unabhängige Analyse.',
+        learn:'Tech-Konzerne bieten "Datenzugang" und "technische Expertise" an – klingt neutral, ist aber selektiv. Nur der Konzern entscheidet, welche Daten in welcher Form gezeigt werden.'},
+       {text:'Datenzugang annehmen – aktuelle Daten verbessern Gesetze.',
+        effect:{i:-20,f:+20,m:0},type:'bad',
+        consequence:'✗ INFORMATIONS-LOBBYING\nDu verwendest die Konzern-Daten in deiner Rede. Kritische Journalisten stellen fest: Die Daten zeigen nur einen Teil der Realität. Deine Glaubwürdigkeit leidet.',
+        learn:'Informationslobbyismus ist die subtilste Form: Wer bestimmt, welche Zahlen als "Fakten" gelten, beeinflusst Entscheidungen stärker als direkter Druck. Agenda-Setting als Macht.'},
+       {text:'Gespräch führen, aber Algorithmus-Transparenz einfordern.',
+        effect:{i:+5,f:+15,m:0},type:'neutral',
+        consequence:'◆ KONSTRUKTIV\nDu nutzt das Gespräch, um Zugeständnisse einzufordern: Algorithmus-Transparenz, unabhängige Audits. MetaSphere ist unwillig – aber du kennst jetzt ihre roten Linien.',
+        learn:'Der EU Digital Services Act (2022) verpflichtet große Plattformen zur Algorithmus-Transparenz. Dafür stimmten viele Abgeordnete gegen massiven Lobbyingdruck – ein demokratischer Erfolg.'}
+     ]}}
+];
+
+// ═══════════════════════════════════════════════════
+// EPILOGUE PATHS (based on final integrity + money)
+// ═══════════════════════════════════════════════════
+function getEpiloguePath(integrity,money,influence){
+  if(money>=50000||(integrity<40&&money>0)) return 'scandal';
+  if(integrity<50) return 'critical';
+  if(integrity>=90) return 'hero';
+  return 'reelect';
+}
+
+const EPILOGUES={
+  scandal:{
+    title:'KAPITEL 2: DER SKANDAL',
+    color:'var(--red)',
+    icon:'📰',
+    headline:'SPIEGEL-TITELSEITE: „KÄUFLICHE DEMOKRATIE?"',
+    headlineColor:'var(--red)',
+    npcKey:'journalist',
+    scenes:[
+      {speaker:'LENA KRAFT',text:'„Guten Tag. Ich bin Lena Kraft, Investigativ-Ressort Spiegel. Wir haben Dokumente, die Ihre Verbindungen zur Lobbyszene belegen. Möchten Sie sich äußern – vor der Veröffentlichung?"'},
+      {speaker:'SYSTEM',text:'DREI MONATE SPÄTER\n\nDer Artikel erscheint. Titel: „Wie Lobbyisten den Bundestag kaufen." Dein Name ist auf Seite 1. Die Partei entzieht dir das Vertrauen. Du gibst dein Mandat zurück.',isNarrator:true},
+    ],
+    choices:[
+      {text:'Alles leugnen und Anwalt einschalten.',effect:{i:-20,f:-20,m:0},type:'bad',
+       consequence:'✗ ESKALATION\nDie Dokumente sind eindeutig. Dein Anwalt rät dir zum Rückzug. Das Leugnen macht alles schlimmer. Die Staatsanwaltschaft ermittelt.',
+       learn:'Transparenz nach Fehlern ist demokratisch wichtiger als ihr Verbergen. Mehrere Lobbyismus-Skandale der letzten Jahre zeigten: Die Vertuschung ist oft schlimmer als der Ursprungsfehler.'},
+      {text:'Vollständig kooperieren und alles offenlegen.',effect:{i:+15,f:-10,m:0},type:'neutral',
+       consequence:'◆ KONSEQUENZEN TRAGEN\nDu kooperierst vollständig. Das Mandat verlierst du trotzdem – aber die Staatsanwaltschaft stellt das Verfahren ein. Deine politische Karriere ist vorerst vorbei.',
+       learn:'Politische Rechenschaftspflicht (Accountability) ist ein Kernprinzip der Demokratie. Wer Fehler eingesteht, stärkt das System – auch wenn er persönlich den Preis zahlt.'}
+    ]
+  },
+  critical:{
+    title:'KAPITEL 2: DIE KRITISCHE FRAGE',
+    color:'var(--orange)',
+    icon:'🎙️',
+    headline:'ABGEORDNETENWATCH STELLT FRAGEN',
+    headlineColor:'var(--orange)',
+    npcKey:'journalist',
+    scenes:[
+      {speaker:'LENA KRAFT',text:'„Auf AbgeordnetenWatch haben Bürgerinnen Fragen zu Ihren Abstimmungen gestellt. Mehrere Verbindungen zu Lobbygruppen wurden analysiert. Wie erklären Sie die Muster?"'},
+      {speaker:'SYSTEM',text:'Die Fragen gehen viral. Dein Büro wird mit Anfragen überflutet. Deine Partei fordert eine Erklärung.',isNarrator:true},
+    ],
+    choices:[
+      {text:'Alle Kontakte offen dokumentieren und auf der Homepage veröffentlichen.',effect:{i:+20,f:-5,m:0},type:'good',
+       consequence:'✓ TRANSPARENZ ALS STRATEGIE\nDu veröffentlichst alle Lobbykontakte. Das ist mehr als gesetzlich gefordert. Transparency International lobt dich als Vorbild. Die Fragen verstummen.',
+       learn:'Freiwillige Transparenz über Lobbykontakte ist in vielen Demokratien Standard. Deutschland hat dies erst 2022 als Pflicht eingeführt – als eines der letzten EU-Länder.'},
+      {text:'Antworten verweigern – ich muss meine Kontakte nicht öffentlich machen.',effect:{i:-10,f:0,m:0},type:'bad',
+       consequence:'✗ MISSTRAUEN\nDie Verweigerung wird als Schuldeingeständnis wahrgenommen. Der Gegenkandidat macht Lobbyismus zum Wahlkampfthema. Dein Stimmenanteil sinkt.',
+       learn:'AbgeordnetenWatch erfasst seit 2004 Antwortverhalten von MdBs. 68% aller Abgeordneten beantworten Bürgerfragen – die anderen riskieren Vertrauensverlust.'}
+    ]
+  },
+  hero:{
+    title:'KAPITEL 2: DER PREIS',
+    color:'var(--green)',
+    icon:'🏆',
+    headline:'TRANSPARENCY INTERNATIONAL NOMINIERUNG',
+    headlineColor:'var(--green)',
+    npcKey:'journalist',
+    scenes:[
+      {speaker:'LENA KRAFT',text:'„Guten Tag – ich schreibe einen Artikel über integre Abgeordnete. Sie wurden von LobbyControl und AbgeordnetenWatch als Positivbeispiel genannt. Darf ich Ihnen ein paar Fragen stellen?"'},
+      {speaker:'SYSTEM',text:'Ein ungewöhnliches Gespräch: Eine Journalistin, die lobt statt anklagt. Deine Geschichte wird Teil einer Transparenz-Kampagne.',isNarrator:true},
+    ],
+    choices:[
+      {text:'Interview geben und konkrete Reformen fordern.',effect:{i:+10,f:+10,m:0},type:'good',
+       consequence:'✓ WIRKUNG ÜBER DAS MANDAT HINAUS\nDein Interview löst eine Debatte aus. Du wirst in Ausschüsse für Lobbytransparenz berufen. Deine Erfahrungen fließen in ein neues Transparenzgesetz ein.',
+       learn:'Politischer Wandel braucht Vorbilder. Mehrere Transparenzreformen der letzten Jahre entstanden, weil einzelne Abgeordnete öffentlich Druck machten – oft gegen den Widerstand der eigenen Partei.'},
+      {text:'Bescheiden bleiben – Integrität ist doch nur das Minimum.',effect:{i:+5,f:+5,m:0},type:'neutral',
+       consequence:'◆ SOLIDE\nDu gibst ein kurzes Interview. Kein großes Aufheben. Du machst weiter deine Arbeit. Das ist auch eine Form der Demokratie: stille Pflichterfüllung.',
+       learn:'Integrität in der Politik ist leider keine Selbstverständlichkeit. Studien zeigen: Wahrgenommene Korruption ist einer der stärksten Treiber von Politikverdrossenheit in Europa.'}
+    ]
+  },
+  reelect:{
+    title:'KAPITEL 2: DIE WIEDERWAHL',
+    color:'var(--blue)',
+    icon:'🗳️',
+    headline:'BUNDESTAGSWAHL – DEIN WAHLKREIS ENTSCHEIDET',
+    headlineColor:'var(--blue)',
+    npcKey:'wahl',
+    scenes:[
+      {speaker:'WAHLKAMPFTEAM',text:'„Die Wahl ist in 4 Wochen. Wir haben kaum Budget. Aber wir haben deine Geschichte. Deine Abstimmungen. Deine Haltung. Reicht das?"'},
+      {speaker:'SYSTEM',text:'Deine Lobbyisten-Verbindungen sind kein Skandal – aber auch kein Ruhmesblatt. Der Gegenkandidat wirft dir Kompromisse vor. Du wirfst ihm Naivität vor. Die Wählerinnen entscheiden.',isNarrator:true},
+    ],
+    choices:[
+      {text:'Kampagne auf Transparenz: Alle Lobbykontakte offenlegen.',effect:{i:+10,f:-5,m:0},type:'good',
+       consequence:'✓ VERTRAUEN GEWONNEN\nDu gewinnst mit 28,4% – weniger als beim ersten Mal. Aber du hast gelernt. Und dein Wahlkreis auch. Die Demokratie funktioniert.',
+       learn:'Vertrauen ist das Kapital der Demokratie. Einmal verloren, ist es schwer zurückzugewinnen – aber möglich. Politische Lernfähigkeit ist eine demokratische Tugend.'},
+      {text:'Defensiv: Die Vorwürfe sind übertrieben, ich habe nichts falsch gemacht.',effect:{i:-5,f:0,m:0},type:'bad',
+       consequence:'✗ KNAPPER SIEG\nDu gewinnst mit 24,1% – hauchdünn. Das Mandat bleibt. Aber die Botschaft ist klar: Wählerinnen haben beobachtet. Beim nächsten Mal wird es enger.',
+       learn:'Wählerinformationsportale wie AbgeordnetenWatch, VoteSwiper und Wahl-O-Mat haben das Informationsniveau der Wähler signifikant erhöht. Abgeordnete können sich nicht mehr hinter Unkenntnis verstecken.'}
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+const G={integrity:100,influence:10,money:0,done:[],choices:[],scene:null,player:null,
+  epilogueChoice:null,epiloguePath:null};
+let introIdx=0, selChar=null, epiSceneIdx=0, epiChoiceMade=false;
+
+// ═══════════════════════════════════════════════════
+// SCREEN
+// ═══════════════════════════════════════════════════
+function go(name){
+  ['title','charselect','intro','map','scenario','result','epilogue','final','knowledge']
+    .forEach(s=>document.getElementById('screen-'+s).classList.add('hidden'));
+  document.getElementById('screen-'+name).classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════════════════
+// TITLE
+// ═══════════════════════════════════════════════════
+function buildTitle(){
+  document.getElementById('screen-title').innerHTML=`
+  <div style="text-align:center;padding:30px 20px;">
+    <div class="pixel-title">BERLIN QUEST</div>
+    <div class="pixel-subtitle">★ DAS LOBBYISMUS-SPIEL ★</div>
+    <div style="font-size:52px;margin:16px 0;filter:drop-shadow(4px 4px 0 #000)">🏛️</div>
+    <div class="panel" style="text-align:left;">
+      <div class="panel-title">▶ DEINE MISSION</div>
+      <div style="font-size:9px;line-height:2.2;color:var(--cyan);">
+        Du bist frisch gewählte/r MdB für den Wahlkreis Köln-Nord.<br>
+        Dein erstes Mandat – Berlin wartet auf dich.<br><br>
+        Aber auch die <span style="color:var(--red)">LOBBY</span> wartet auf dich.<br>
+        5 Szenarien. 2 Kapitel. Viele mögliche Enden.<br>
+        Triff weise Entscheidungen. Oder nicht.
+      </div>
+    </div>
+    <div class="info-card">
+      <span class="info-title">📚 LERNZIEL – SoWi EF NRW · Inhaltsfeld 2</span>
+      Erkunde 5 reale Lobbying-Szenarien aus Energie, Pharma,<br>
+      Rüstung, Finanzen und Tech. Erlerne:<br>
+      Was ist Lobbyismus? Wie arbeitet er? Wo sind die Grenzen?<br>
+      Was sind Effizienz und Legitimität in der Praxis?
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:16px;">
+      <button class="pixel-btn gold" onclick="go('charselect')">▶ SPIEL STARTEN</button>
+      <button class="pixel-btn purple" onclick="buildKnowledge();go('knowledge')">📖 LERNKARTE</button>
+    </div>
+    <div style="font-size:7px;color:var(--gray);margin-top:16px;line-height:2;">
+      Basierend auf realen Daten · lobbycontrol.de · abgeordnetenwatch.de · bundestag.de<br>
+      SoWi EF NRW · Inhaltsfeld 2: Politische Strukturen, Prozesse und Partizipation
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// CHAR SELECT
+// ═══════════════════════════════════════════════════
+function buildCharSelect(){
+  let html=`<div class="panel"><div class="panel-title">👤 WÄHLE DEINEN CHARAKTER</div>
+  <div style="font-size:9px;color:var(--gray);margin-bottom:16px;">Deine Wahl beeinflusst Startwerte und persönliche Geschichte.</div>
+  <div class="char-grid" id="cgrid"></div>
+  <div style="text-align:center;margin-top:8px;">
+    <button class="pixel-btn gold" id="startbtn" onclick="confirmChar()" style="display:none;">▶ SPIEL STARTEN</button>
+  </div></div>`;
+  document.getElementById('screen-charselect').innerHTML=html;
+  const grid=document.getElementById('cgrid');
+  CHARS.forEach(ch=>{
+    const card=document.createElement('div');
+    card.className='char-card';card.id='cc-'+ch.id;
+    const cv=mkCV(ch,16);cv.style.margin='0 auto 10px';
+    card.appendChild(cv);
+    card.innerHTML+=`
+      <div class="char-name" style="color:${ch.color}">${ch.name}</div>
+      <div class="char-job">${ch.job}</div>
+      <div class="char-trait" style="margin-top:6px;">
+        <span style="color:var(--gold)">▶</span> ${ch.trait1} &nbsp;
+        <span style="color:var(--gold)">▶</span> ${ch.trait2} &nbsp;
+        <span style="color:var(--gold)">▶</span> ${ch.trait3}
+      </div>
+      <div class="char-bonus">▶ ${ch.bonus}</div>`;
+    card.onclick=()=>selChar2(ch);
+    grid.appendChild(card);
+  });
+}
+
+function selChar2(ch){
+  selChar=ch;
+  document.querySelectorAll('.char-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('cc-'+ch.id).classList.add('selected');
+  document.getElementById('startbtn').style.display='inline-block';
+}
+
+function confirmChar(){
+  if(!selChar)return;
+  G.player=selChar;G.integrity=selChar.startI;G.influence=selChar.startF;
+  introIdx=0;buildIntro();go('intro');
+}
+
+// ═══════════════════════════════════════════════════
+// INTRO
+// ═══════════════════════════════════════════════════
+function getIntroLines(){
+  const n=G.player.name;
+  return[
+    {sp:'ERZÄHLER',txt:`Berlin Hauptbahnhof. 8:47 Uhr.\n${n} betritt zum ersten Mal\nals Abgeordnete/r die Hauptstadt.\nKoffer in der Hand. Träume im Gepäck.`},
+    {sp:n,txt:'Endlich! Jahre der Arbeit,\ndann der Sprung in den Bundestag.\nIch werde wirklich etwas verändern.\nDie Leute haben mich nicht umsonst gewählt.'},
+    {sp:'ERZÄHLER',txt:'Noch am selben Tag klingelt das Handy.\nEine unbekannte Nummer.\nEine Einladung. Ein „freundliches" Gespräch.\nBerlin ist eine Stadt der Interessen.'},
+    {sp:'UNBEKANNTE STIMME',txt:'„Herzlichen Glückwunsch zum Mandat!\nWir verfolgen Ihre Karriere mit großem Interesse.\nDürfen wir Sie zu einem Dinner einladen?\nNur ein informelles Kennenlernen..."'},
+    {sp:n,txt:'...Wer sind diese Leute?\nUnd was wollen sie von mir?\nWarum rufen Konzerne an, noch bevor\nich meinen ersten Arbeitstag hatte?'},
+    {sp:'ERZÄHLER',txt:'Willkommen in der Welt des Lobbyismus.\nIn Deutschland: 7.200 registrierte Interessengruppen.\nBudget: 500+ Mio. €/Jahr.\nSie alle haben Ziele – und Mittel.\nDeine Integrität ist ihr Ziel.'}
+  ];
+}
+
+function buildIntro(){
+  document.getElementById('screen-intro').innerHTML=`
+  <div class="panel">
+    <div class="panel-title">📖 KAPITEL 1: ANKUNFT IN BERLIN</div>
+    <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px;">
+      <div id="intro-cv"></div>
+      <div>
+        <div style="font-size:10px;color:${G.player.color};margin-bottom:6px;">${G.player.name}</div>
+        <div style="font-size:8px;color:var(--gray);line-height:1.8;">${G.player.job}</div>
+        <div style="font-size:8px;color:var(--cyan);line-height:1.8;margin-top:6px;">${G.player.backstory}</div>
+      </div>
+    </div>
+    <div class="dialogue-box">
+      <div class="dialogue-speaker" id="intro-sp">ERZÄHLER</div>
+      <div class="dialogue-text" id="intro-txt"></div>
+    </div>
+    <div style="text-align:center;">
+      <button class="pixel-btn" onclick="nextIntro()">WEITER ▶</button>
+    </div>
+  </div>`;
+  const cv=mkCV(G.player,16);
+  document.getElementById('intro-cv').appendChild(cv);
+  showIntroLine();
+}
+
+function showIntroLine(){
+  const lines=getIntroLines();
+  const l=lines[introIdx];
+  document.getElementById('intro-sp').textContent=l.sp;
+  document.getElementById('intro-txt').innerHTML=l.txt.replace(/\n/g,'<br>');
+}
+
+function nextIntro(){
+  const lines=getIntroLines();
+  introIdx++;
+  if(introIdx>=lines.length){buildMap();go('map');return;}
+  showIntroLine();
+}
+
+// ═══════════════════════════════════════════════════
+// BERLIN PIXEL MAP
+// ═══════════════════════════════════════════════════
+
+// Location pins: [id, x%, y%, label, icon, color]
+const MAP_PINS=[
+  {id:'energy', x:44, y:28, label:'Wirtschafts-\nministerium', icon:'⚡', color:'#f0c040'},
+  {id:'pharma',  x:62, y:42, label:'Bundestag-\nCafeteria',   icon:'💊', color:'#40d0f0'},
+  {id:'defense', x:30, y:48, label:'Parlament.\nBüro',        icon:'🪖', color:'#a040f0'},
+  {id:'finance', x:55, y:65, label:'Luxus-\nRestaurant',      icon:'💰', color:'#f08040'},
+  {id:'tech',    x:72, y:25, label:'Start-Up-\nHub',          icon:'📱', color:'#40c040'},
+];
+
+// Pixel art Berlin map grid (80×50 pixels, each = 8px rendered)
+// Color keys: W=water/Spree, P=park, R=road, B=building, D=dark building,
+//             G=gov building, T=train, S=street, .=background
+const MSCALE=8;
+const MMAP=[
+  '................................................................................',
+  '..BBBB..BBB...BBB..BBB...BBB..BBB...BBB..BBB...BBB..BBB...BB..BBB..BB...........',
+  '..BBBB..BBB...BBB..BBB...BBB..BBB...BBB..BBB...BBB..BBB...BB..BBB..BB..BBBB.....',
+  '..BB....BB....BB...BBRRRRBBB..BBRRRRBBB..BB....BB...BB....BB..BBRRRBB..BBBB.....',
+  '..BB....BB....BB...BBRRRRBBB..BBRRRRBBB..BB....BB...BB....BB..BBRRRBB..BB.......',
+  '..BBBB..BBB...BB...BB....BBB..BB....BBB..BBB...BB...BBBB..BB..BB...BB..BBBB.....',
+  '..BBBB..BBB...BB...BB....BBB..BB....BBB..BBB...BB...BBBB..BB..BB...BB..BBBB.....',
+  '................................................................................',
+  '....PPPPPP.....SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.......................',
+  '....PPPPPP.....S....................................................S.............',
+  '....PPPPPP.....S...GGGGG....BBB...BBB...BBB...BBB.....DDDDD........S............',
+  '....PPPPPP.....S...GGGGG....BBB...BBB...BBB...BBB.....DDDDD........S............',
+  '....PPPPPP.....S...GGGGG....BBB...BBB...BBB...BBB.....DDDDD........S............',
+  '....PPPPPP.....S...GGGGG....SSS...SSS...SSS...SSS.....DDDDD........S............',
+  '................SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS............',
+  '...WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW.......',
+  '...WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW.......',
+  '...WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW.......',
+  '................SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.........',
+  '....PPPPP......S....BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB....S.........',
+  '....PPPPP......S....BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB....S.........',
+  '....PPPPP......S....SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS....S.........',
+  '....PPPPP......S....................................................S.........',
+  '................SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.........',
+  '...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB.............',
+  '...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB.............',
+  '...BBB...SSS...BBB...SSS...BBB...SSS...BBB...SSS...BBB...SSS...BBB.............',
+  '...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS.............',
+  '................................................................................',
+  '...BBB...BBB...BBB...BBB...PPPPPP...BBB...BBB...BBB...BBB...BBB................',
+  '...BBB...BBB...BBB...BBB...PPPPPP...BBB...BBB...BBB...BBB...BBB................',
+  '...BBB...SSS...BBB...SSS...PPPPPP...SSS...BBB...SSS...BBB...SSS................',
+  '...SSS...SSS...SSS...SSS...SSSSSS...SSS...SSS...SSS...SSS...SSS................',
+  '................................................................................',
+  '...TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...........',
+  '...TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...........',
+  '................................................................................',
+  '...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB................',
+  '...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB................',
+  '...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS................',
+  '................................................................................',
+  '...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB................',
+  '...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB................',
+  '...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS................',
+  '................................................................................',
+  '...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB................',
+  '...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB...BBB................',
+  '...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS...SSS................',
+  '................................................................................',
+  '................................................................................',
+  '................................................................................',
+];
+
+const MPAL={
+  'W':'#1a3a6a', // Spree
+  'P':'#1a4a1a', // Tiergarten/Parks
+  'R':'#3a3a5a', // roads
+  'S':'#2a2a4a', // streets
+  'B':'#2a2a5a', // buildings
+  'D':'#1a1a3a', // dark buildings
+  'G':'#1a2a4a', // gov buildings
+  'T':'#2a1a1a', // train
+  '.':'#0d0d1f', // background
+};
+
+function drawBerlinMap(canvas){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const cols=MMAP[0].length, rows=MMAP.length;
+  const pw=W/cols, ph=H/rows;
+
+  // Background
+  ctx.fillStyle='#0d0d1f';
+  ctx.fillRect(0,0,W,H);
+
+  // Draw map grid
+  MMAP.forEach((row,y)=>{
+    [...row].forEach((c,x)=>{
+      if(c!=='.'&&MPAL[c]){
+        ctx.fillStyle=MPAL[c];
+        ctx.fillRect(Math.round(x*pw),Math.round(y*ph),Math.ceil(pw)+1,Math.ceil(ph)+1);
+      }
+    });
+  });
+
+  // Grid overlay for pixel feel
+  ctx.strokeStyle='rgba(0,0,0,0.15)';
+  ctx.lineWidth=0.5;
+  for(let x=0;x<W;x+=pw*4){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=ph*4){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // Spree label
+  ctx.fillStyle='rgba(100,160,255,0.5)';
+  ctx.font='bold 10px monospace';
+  ctx.fillText('~ SPREE ~', W*0.1, H*0.35);
+
+  // Tiergarten label
+  ctx.fillStyle='rgba(60,120,60,0.7)';
+  ctx.font='bold 9px monospace';
+  ctx.fillText('TIERGARTEN', W*0.04, H*0.27);
+
+  // Reichstag marker
+  ctx.fillStyle='#f0c040';
+  ctx.font='bold 10px monospace';
+  ctx.fillText('🏛', W*0.38, H*0.31);
+}
+
+function drawMapPins(canvas, hoverId){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+
+  MAP_PINS.forEach(pin=>{
+    const done=G.done.includes(pin.id);
+    const hov=pin.id===hoverId;
+    const px=pin.x/100*W;
+    const py=pin.y/100*H;
+
+    // Pulse ring for undone
+    if(!done){
+      ctx.beginPath();
+      ctx.arc(px,py,hov?18:14,0,Math.PI*2);
+      ctx.fillStyle=hov?pin.color+'55':pin.color+'33';
+      ctx.fill();
+    }
+
+    // Pin circle
+    ctx.beginPath();
+    ctx.arc(px,py,hov?12:9,0,Math.PI*2);
+    ctx.fillStyle=done?'#303050':pin.color;
+    ctx.fill();
+    ctx.strokeStyle=done?'#505070':'#fff';
+    ctx.lineWidth=2;
+    ctx.stroke();
+
+    // Icon or checkmark
+    ctx.font=`${hov?14:11}px serif`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(done?'✓':pin.icon, px, py);
+
+    // Label bubble
+    const lines=pin.label.split('\n');
+    const lw=Math.max(...lines.map(l=>l.length))*5.5+10;
+    const lh=lines.length*13+8;
+    const lx=px-lw/2;
+    const ly=py+15;
+
+    // Keep label inside canvas
+    const clampedLx=Math.max(4,Math.min(W-lw-4,lx));
+
+    ctx.fillStyle=done?'rgba(30,30,60,0.85)':'rgba(10,10,30,0.92)';
+    ctx.strokeStyle=done?'#505070':pin.color;
+    ctx.lineWidth=1.5;
+    roundRect(ctx,clampedLx,ly,lw,lh,4);
+    ctx.fill();ctx.stroke();
+
+    ctx.fillStyle=done?'#606080':pin.color;
+    ctx.font=`bold 8px "Press Start 2P", monospace`;
+    ctx.textAlign='center';
+    lines.forEach((l,i)=>{
+      ctx.fillText(l, clampedLx+lw/2, ly+10+i*13);
+    });
+    ctx.textAlign='left';
+    ctx.textBaseline='alphabetic';
+  });
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+}
+
+// ═══════════════════════════════════════════════════
+// MAP
+// ═══════════════════════════════════════════════════
+function buildMap(){
+  document.getElementById('screen-map').innerHTML=`
+  <div id="stats-bar">
+    <div class="stat-box"><span class="stat-label">INTEGRITÄT</span>
+      <span class="stat-value" id="st-i" style="color:var(--green)">100</span>
+      <div class="stat-bar-wrap"><div class="stat-bar-fill" id="br-i" style="width:100%;background:var(--green)"></div></div></div>
+    <div class="stat-box"><span class="stat-label">EINFLUSS</span>
+      <span class="stat-value" id="st-f" style="color:var(--blue)">10</span>
+      <div class="stat-bar-wrap"><div class="stat-bar-fill" id="br-f" style="width:10%;background:var(--blue)"></div></div></div>
+    <div class="stat-box"><span class="stat-label">LOBBY-€</span>
+      <span class="stat-value" id="st-m" style="color:var(--gold)">0</span>
+      <div class="stat-bar-wrap"><div class="stat-bar-fill" id="br-m" style="width:0%;background:var(--gold)"></div></div></div>
+    <div class="stat-box"><span class="stat-label">SZENARIEN</span>
+      <span class="stat-value" id="st-s" style="color:var(--cyan)">0/5</span>
+      <div class="stat-bar-wrap"><div class="stat-bar-fill" id="br-s" style="width:0%;background:var(--cyan)"></div></div></div>
+  </div>
+  <div class="panel" style="padding:12px;">
+    <div class="panel-title">🗺️ BERLIN – KAPITEL 1: DIE LOBBYISTEN</div>
+    <div style="font-size:8px;color:var(--gray);margin-bottom:10px;text-align:center;">
+      Klicke auf einen Ort um das Szenario zu starten. ✓ = bereits erledigt.
+    </div>
+    <div style="position:relative;width:100%;">
+      <canvas id="berlin-map" style="width:100%;display:block;border:3px solid var(--border);box-shadow:4px 4px 0 #000;cursor:pointer;"></canvas>
+      <div id="map-tooltip" style="display:none;position:absolute;background:var(--panel);border:2px solid var(--gold);
+        padding:8px 12px;font-size:8px;color:var(--gold);box-shadow:3px 3px 0 #000;pointer-events:none;z-index:10;line-height:1.8;"></div>
+    </div>
+  </div>
+  <div class="info-card" id="maptip">
+    <span class="info-title">💡 TIPP</span>
+    Klicke auf die leuchtenden Pins auf der Karte. Jedes Szenario = ein anderer Lobbying-Bereich.<br>
+    Deine Entscheidungen bestimmen dein Ende in Kapitel 2!
+  </div>`;
+
+  // Setup canvas
+  const canvas=document.getElementById('berlin-map');
+  // Set internal resolution
+  const W=820,H=460;
+  canvas.width=W;canvas.height=H;
+
+  // Draw base map
+  drawBerlinMap(canvas);
+  drawMapPins(canvas,null);
+
+  // Animate undone pins with pulse
+  let frame=0;
+  let animId=null;
+  function animate(){
+    drawBerlinMap(canvas);
+    // pulsing: vary ring size with sin
+    const t=Date.now()/600;
+    const ctx=canvas.getContext('2d');
+    MAP_PINS.forEach(pin=>{
+      const done=G.done.includes(pin.id);
+      const px=pin.x/100*W;
+      const py=pin.y/100*H;
+      if(!done){
+        const r=11+Math.sin(t+pin.x)*3;
+        ctx.beginPath();ctx.arc(px,py,r,0,Math.PI*2);
+        ctx.fillStyle=pin.color+'44';ctx.fill();
+      }
+    });
+    drawMapPins(canvas,null);
+    animId=requestAnimationFrame(animate);
+  }
+  animate();
+
+  // Store animId to cancel on screen change
+  canvas._animId=animId;
+  canvas.addEventListener('animId',()=>cancelAnimationFrame(animId));
+
+  // Mouse interaction
+  canvas.addEventListener('mousemove',e=>{
+    const rect=canvas.getBoundingClientRect();
+    const scaleX=W/rect.width;
+    const scaleY=H/rect.height;
+    const mx=(e.clientX-rect.left)*scaleX;
+    const my=(e.clientY-rect.top)*scaleY;
+    let hit=null;
+    MAP_PINS.forEach(pin=>{
+      const px=pin.x/100*W;
+      const py=pin.y/100*H;
+      const dist=Math.sqrt((mx-px)**2+(my-py)**2);
+      if(dist<22)hit=pin;
+    });
+    canvas.style.cursor=hit&&!G.done.includes(hit.id)?'pointer':'default';
+    const tip=document.getElementById('map-tooltip');
+    if(hit){
+      const loc=LOCS.find(l=>l.id===hit.id);
+      const done=G.done.includes(hit.id);
+      tip.style.display='block';
+      tip.style.left=(e.clientX-rect.left+12)+'px';
+      tip.style.top=(e.clientY-rect.top-10)+'px';
+      tip.innerHTML=`<span style="color:${hit.color}">${hit.icon} ${hit.label.replace('\n',' ')}</span><br>
+        <span style="color:var(--gray)">${loc?loc.lobby:''}</span><br>
+        <span style="color:${done?'var(--green)':'var(--gold)'}">${done?'✓ ERLEDIGT':'▶ BETRETEN'}</span>`;
+    } else {
+      tip.style.display='none';
+    }
+  });
+
+  canvas.addEventListener('mouseleave',()=>{
+    document.getElementById('map-tooltip').style.display='none';
+  });
+
+  canvas.addEventListener('click',e=>{
+    const rect=canvas.getBoundingClientRect();
+    const scaleX=W/rect.width;
+    const scaleY=H/rect.height;
+    const mx=(e.clientX-rect.left)*scaleX;
+    const my=(e.clientY-rect.top)*scaleY;
+    MAP_PINS.forEach(pin=>{
+      const px=pin.x/100*W;
+      const py=pin.y/100*H;
+      const dist=Math.sqrt((mx-px)**2+(my-py)**2);
+      if(dist<22&&!G.done.includes(pin.id)){
+        const loc=LOCS.find(l=>l.id===pin.id);
+        if(loc){
+          cancelAnimationFrame(canvas._animId);
+          startScene(loc);
+        }
+      }
+    });
+  });
+
+  checkMapDone();
+  updateStats();
+}
+
+function checkMapDone(){
+  const allDone=G.done.length===LOCS.length;
+  const tip=document.getElementById('maptip');
+  if(tip&&allDone){
+    tip.innerHTML=`<span class="info-title">✓ KAPITEL 1 ABGESCHLOSSEN!</span>
+    Alle 5 Locations besucht. Deine Entscheidungen haben dich geformt.<br>
+    <button class="pixel-btn gold" id="epi-start-btn" style="margin-top:12px;">▶ KAPITEL 2: DIE KONSEQUENZEN</button>`;
+    document.getElementById('epi-start-btn').addEventListener('click',()=>startEpilogue());
+  }
+}
+
+function updateStats(){
+  const i=Math.max(0,Math.min(100,G.integrity));
+  const ic=i>60?'var(--green)':i>30?'var(--orange)':'var(--red)';
+  const si=document.getElementById('st-i');const bi=document.getElementById('br-i');
+  const sf=document.getElementById('st-f');const bf=document.getElementById('br-f');
+  const sm=document.getElementById('st-m');const bm=document.getElementById('br-m');
+  const ss=document.getElementById('st-s');const bs=document.getElementById('br-s');
+  if(si){si.textContent=i;si.style.color=ic;bi.style.width=i+'%';bi.style.background=ic;}
+  if(sf){sf.textContent=G.influence;bf.style.width=Math.min(100,G.influence)+'%';}
+  if(sm){sm.textContent=G.money>0?G.money+'€':'0';bm.style.width=Math.min(100,G.money/1000)+'%';}
+  if(ss){ss.textContent=G.done.length+'/5';bs.style.width=(G.done.length/5*100)+'%';}
+}
+
+// ═══════════════════════════════════════════════════
+// SCENARIO
+// ═══════════════════════════════════════════════════
+function startScene(loc){
+  G.scene=loc;const sc=loc.scenario;const npc=NPCS[loc.npcKey];
+  const npcCv=mkCV(npc,16);
+  const choices=sc.choices.map((c,i)=>`
+    <button class="choice-btn" onclick="makeChoice(${i})">
+      <span class="choice-prefix">${['A','B','C'][i]}▶</span>
+      <span>${c.text}</span>
+    </button>`).join('');
+  document.getElementById('scenario-content').innerHTML=`
+  <div class="panel">
+    <div class="panel-title">📍 ${sc.title}</div>
+    <div class="npc-row" id="npc-slot">
+      <div class="npc-bio-box">
+        <div class="npc-name-txt" style="color:${loc.color}">${npc.name}</div>
+        <div class="npc-role-txt">${npc.role}</div>
+        <div class="npc-bio-txt">${npc.bio}</div>
+      </div>
+    </div>
+    <div style="font-size:8px;color:var(--orange);padding:8px;border:1px solid var(--orange);
+      background:rgba(240,128,64,.08);margin-bottom:12px;line-height:2;">${sc.context}</div>
+    <div style="font-size:9px;color:var(--gray);margin-bottom:12px;line-height:2;">${sc.setup}</div>
+    <div class="dialogue-box">
+      <div class="dialogue-speaker" style="color:${loc.color}">${npc.name}</div>
+      <div class="dialogue-text">${sc.dialogue}</div>
+    </div>
+    <div class="info-card">
+      <span class="info-title">📊 ${loc.lobby.toUpperCase()} – REALE DATEN</span>${sc.realFact}
+    </div>
+    <div class="pixel-divider"></div>
+    <div style="font-size:9px;color:var(--gold);margin-bottom:12px;">▶ WAS TUT ${G.player?G.player.name.split(' ')[0]:'DU'}?</div>
+    <div class="choices">${choices}</div>
+  </div>
+  <div style="text-align:center;margin-top:12px;">
+    <button class="pixel-btn" id="sc-back-btn">◀ ZURÜCK ZUR KARTE</button>
+  </div>`;
+  document.getElementById('npc-slot').prepend(npcCv);
+  document.getElementById('sc-back-btn').addEventListener('click',()=>{buildMap();go('map');});
+  go('scenario');
+}
+
+function makeChoice(idx){
+  const sc=G.scene.scenario;const ch=sc.choices[idx];
+  G.integrity+=ch.effect.i;G.influence+=ch.effect.f;G.money+=ch.effect.m;
+  G.integrity=Math.max(0,G.integrity);
+  if(!G.done.includes(G.scene.id))G.done.push(G.scene.id);
+  G.choices.push({scene:G.scene.id,idx,type:ch.type});
+  showResult(ch);
+}
+
+function showResult(ch){
+  const cls=ch.type==='good'?'consequence-good':ch.type==='bad'?'consequence-bad':'consequence-neutral';
+  const fx=[];
+  if(ch.effect.i>0)fx.push(`<span style="color:var(--green)">+${ch.effect.i} INTEGRITÄT</span>`);
+  if(ch.effect.i<0)fx.push(`<span style="color:var(--red)">${ch.effect.i} INTEGRITÄT</span>`);
+  if(ch.effect.f>0)fx.push(`<span style="color:var(--blue)">+${ch.effect.f} EINFLUSS</span>`);
+  if(ch.effect.m>0)fx.push(`<span style="color:var(--gold)">+${ch.effect.m}€ LOBBY-€</span>`);
+  const left=LOCS.filter(l=>!G.done.includes(l.id)).length;
+  const pCv=G.player?mkCV(G.player,12):null;
+  document.getElementById('result-content').innerHTML=`
+  <div class="panel">
+    <div class="panel-title">⚡ KONSEQUENZ</div>
+    <div id="rcv" style="text-align:center;margin-bottom:12px;"></div>
+    <div class="${cls} consequence-box">${ch.consequence.replace(/\n/g,'<br>')}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;">${fx.join('')}</div>
+    <div class="pixel-divider"></div>
+    <div class="info-card">
+      <span class="info-title">🎓 FACHWISSEN</span>${ch.learn}
+    </div>
+    <div style="margin-top:16px;text-align:center;">
+      <div style="font-size:8px;color:var(--gray);margin-bottom:12px;">
+        SZENARIEN: ${G.done.length}/5 · INTEGRITÄT: ${Math.max(0,Math.min(100,G.integrity))} · ${left>0?left+' VERBLEIBEND':'KAPITEL 1 FERTIG!'}
+      </div>
+      ${left>0
+        ?`<button class="pixel-btn gold" id="res-map-btn">◀ ZUR KARTE</button>`
+        :`<button class="pixel-btn green" id="res-epi-btn">▶ KAPITEL 2: DIE KONSEQUENZEN</button>`}
+    </div>
+  </div>`;
+  if(pCv){pCv.style.margin='0 auto';document.getElementById('rcv').appendChild(pCv);}
+  if(left>0){
+    const b=document.getElementById('res-map-btn');
+    if(b)b.addEventListener('click',()=>{buildMap();go('map');});
+  } else {
+    const b=document.getElementById('res-epi-btn');
+    if(b)b.addEventListener('click',()=>startEpilogue());
+  }
+  go('result');
+}
+
+// ═══════════════════════════════════════════════════
+// EPILOGUE
+// ═══════════════════════════════════════════════════
+function startEpilogue(){
+  const path=getEpiloguePath(G.integrity,G.money,G.influence);
+  G.epiloguePath=path;
+  const ep=EPILOGUES[path];
+  epiSceneIdx=0;epiChoiceMade=false;
+  buildEpiScene(ep,0);go('epilogue');
+}
+
+function buildEpiScene(ep,idx){
+  const npc=NPCS[ep.npcKey];
+  const npcCv=mkCV(npc,16);
+  const pCv=G.player?mkCV(G.player,12):null;
+  const sc=ep.scenes[idx];
+  const isLast=idx>=ep.scenes.length-1;
+  document.getElementById('epilogue-content').innerHTML=`
+  <div class="panel">
+    <div class="panel-title" style="color:${ep.color}">📖 ${ep.title}</div>
+    <div style="text-align:center;font-size:36px;margin:12px 0;">${ep.icon}</div>
+    <div style="text-align:center;">
+      <div class="epilogue-headline" style="border-color:${ep.headlineColor};color:${ep.headlineColor};">${ep.headline}</div>
+    </div>
+    <div class="npc-row" id="epi-npc" style="margin-top:16px;">
+      <div class="npc-bio-box">
+        <div class="npc-name-txt" style="color:${ep.color}">${npc.name}</div>
+        <div class="npc-role-txt">${npc.role}</div>
+        ${pCv?`<div id="epi-pcv" style="margin-top:8px;"></div>`:''}
+      </div>
+    </div>
+    <div class="dialogue-box" style="border-color:${ep.color};">
+      <div class="dialogue-speaker" style="color:${ep.color};">${sc.isNarrator?'ERZÄHLER':sc.speaker}</div>
+      <div class="dialogue-text">${(sc.text||sc.txt||'').replace(/\n/g,'<br>')}</div>
+    </div>
+    <div style="text-align:center;margin-top:12px;">
+      ${isLast&&!epiChoiceMade
+        ?buildEpiChoices(ep)
+        :`<button class="pixel-btn" onclick="nextEpiScene()">WEITER ▶</button>`}
+    </div>
+  </div>`;
+  document.getElementById('epi-npc').prepend(npcCv);
+  if(pCv&&document.getElementById('epi-pcv'))document.getElementById('epi-pcv').appendChild(pCv);
+}
+
+function buildEpiChoices(ep){
+  return `<div class="choices" style="text-align:left;">
+    ${ep.choices.map((c,i)=>`
+    <button class="choice-btn" onclick="makeEpiChoice(${i})">
+      <span class="choice-prefix">${['A','B'][i]}▶</span>
+      <span>${c.text}</span>
+    </button>`).join('')}
+  </div>`;
+}
+
+function nextEpiScene(){
+  epiSceneIdx++;
+  const ep=EPILOGUES[G.epiloguePath];
+  if(epiSceneIdx<ep.scenes.length){buildEpiScene(ep,epiSceneIdx);}
+  else{buildEpiScene(ep,ep.scenes.length-1);}
+}
+
+function makeEpiChoice(idx){
+  epiChoiceMade=true;
+  const ep=EPILOGUES[G.epiloguePath];
+  const ch=ep.choices[idx];
+  G.epilogueChoice={idx,type:ch.type};
+  G.integrity+=ch.effect.i;G.influence+=ch.effect.f;
+  const cls=ch.type==='good'?'consequence-good':ch.type==='bad'?'consequence-bad':'consequence-neutral';
+  const div=document.createElement('div');
+  div.className=cls+' consequence-box';
+  div.innerHTML=ch.consequence.replace(/\n/g,'<br>');
+  const learnDiv=document.createElement('div');
+  learnDiv.className='info-card';learnDiv.style.marginTop='12px';
+  learnDiv.innerHTML=`<span class="info-title">🎓 FACHWISSEN</span>${ch.learn}`;
+  const btn=document.createElement('div');
+  btn.style.textAlign='center';btn.style.marginTop='16px';
+  btn.innerHTML=`<button class="pixel-btn gold" onclick="showFinal()">▶ ABSCHLUSSBILDSCHIRM</button>`;
+  document.querySelector('#epilogue-content .panel').appendChild(div);
+  document.querySelector('#epilogue-content .panel').appendChild(learnDiv);
+  document.querySelector('#epilogue-content .panel').appendChild(btn);
+  // Remove old buttons
+  const oldChoices=document.querySelector('#epilogue-content .choices');
+  if(oldChoices)oldChoices.remove();
+}
+
+// ═══════════════════════════════════════════════════
+// FINAL
+// ═══════════════════════════════════════════════════
+function showFinal(){
+  const i=Math.max(0,Math.min(100,G.integrity));
+  const good=G.choices.filter(c=>c.type==='good').length;
+  const bad=G.choices.filter(c=>c.type==='bad').length;
+  const ep=G.epiloguePath;
+  let title,tc,desc,stars,ending;
+  const epiGood=G.epilogueChoice&&G.epilogueChoice.type==='good';
+
+  if(ep==='scandal'){
+    if(epiGood){title='SPÄTE EINSICHT';tc='var(--orange)';stars='★★☆☆☆';
+      desc='Du hast Fehler gemacht – aber du hast Verantwortung übernommen. Das kostet dich das Mandat. Aber es rettet die Demokratie ein kleines Stück.';
+      ending='Dein Mandat: ZURÜCKGEGEBEN\nDein Ruf: BESCHÄDIGT ABER REPARIERBAR\nDie Demokratie: WACHSAM';}
+    else{title='SYSTEM-SPIELER';tc='var(--red)';stars='★☆☆☆☆';
+      desc='Du hast versucht, das System zu spielen. Das System hat zurückgespielt.';
+      ending='Dein Mandat: ENTZOGEN\nDein Ruf: RUINIERT\nDie Demokratie: GESCHWÄCHT';}
+  } else if(ep==='critical'){
+    if(epiGood){title='TRANSPARENZ-VORBILD';tc='var(--cyan)';stars='★★★★☆';
+      desc='Du warst nicht perfekt – aber du hast gelernt und transparent reagiert. Das ist Demokratie in Aktion.';
+      ending='Dein Mandat: STABIL\nDein Ruf: WIEDERHERGESTELLT\nDie Demokratie: GESTÄRKT';}
+    else{title='GRAUZONE';tc='var(--orange)';stars='★★☆☆☆';
+      desc='Du hast dich in der Grauzone bewegt und bist dort geblieben. Nicht strafbar – aber auch nicht das, wofür man dich gewählt hat.';
+      ending='Dein Mandat: GEFÄHRDET\nDein Ruf: BESCHÄDIGT\nDie Demokratie: ANGESPANNT';}
+  } else if(ep==='hero'){
+    title='DEMOKRATIEHÜTER';tc='var(--green)';stars='★★★★★';
+    desc='Du hast dein Mandat mit beeindruckender Integrität ausgeübt. Du wirst nicht reich. Aber die Demokratie braucht Menschen wie dich.';
+    ending='Dein Mandat: WIEDERGEWÄHLT MIT STARKEM ERGEBNIS\nDein Ruf: VORBILDLICH\nDie Demokratie: GESTÄRKT';
+  } else {
+    if(epiGood){title='PRAGMATISCHE/R MdB';tc='var(--blue)';stars='★★★☆☆';
+      desc='Du hast Fehler gemacht, aber auch gelernt. Die meisten Abgeordneten navigieren so durch das Labyrinth.';
+      ending='Dein Mandat: WIEDERGEWÄHLT\nDein Ruf: SOLIDE\nDie Demokratie: FUNKTIONIERT';}
+    else{title='UNTER BEOBACHTUNG';tc='var(--orange)';stars='★★☆☆☆';
+      desc='Du hast knapp gewonnen – aber die Wählerinnen haben beobachtet. Beim nächsten Mal wird es enger.';
+      ending='Dein Mandat: KNAPPER SIEG\nDein Ruf: ANGEKRATZT\nDie Demokratie: WACHSAM';}
+  }
+
+  const pCv=G.player?mkCV(G.player,16):null;
+  document.getElementById('final-content').innerHTML=`
+  <div class="panel">
+    <div class="panel-title" style="text-align:center;">🏆 ABSCHLUSSBILANZ</div>
+    <div id="final-cv" style="text-align:center;margin:16px 0;"></div>
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:14px;color:${tc};margin-bottom:8px;text-shadow:3px 3px 0 #000;">${title}</div>
+      <div class="stars">${stars}</div>
+      ${G.player?`<div style="font-size:8px;color:var(--gray);margin-top:8px;">${G.player.name} · ${G.player.job}</div>`:''}
+    </div>
+    <div class="score-grid">
+      <div class="score-item"><span class="score-label">INTEGRITÄT</span>
+        <span class="score-val" style="color:${i>=60?'var(--green)':i>=30?'var(--orange)':'var(--red)'}">${i}</span></div>
+      <div class="score-item"><span class="score-label">LOBBY-€</span>
+        <span class="score-val" style="color:${G.money===0?'var(--green)':'var(--red)'}">${G.money}€</span></div>
+      <div class="score-item"><span class="score-label">GUTE ENTSCH.</span>
+        <span class="score-val" style="color:var(--green)">${good}</span></div>
+      <div class="score-item"><span class="score-label">SCHLECHTE</span>
+        <span class="score-val" style="color:var(--red)">${bad}</span></div>
+    </div>
+    <div class="panel" style="border-color:${tc};margin-top:12px;">
+      <div style="font-size:9px;line-height:2.2;">${desc}</div>
+    </div>
+    <div style="font-size:9px;color:${tc};padding:12px;border:2px solid ${tc};margin:12px 0;line-height:2.2;background:rgba(0,0,0,.3);">
+      ${ending.replace(/\n/g,'<br>')}
+    </div>
+    <div class="pixel-divider"></div>
+    <div class="info-card">
+      <span class="info-title">📚 FAKTEN ZUM MITNEHMEN</span>
+      <span style="color:var(--gold)">7.200+</span> registrierte Interessengruppen beim Bundestag<br>
+      <span style="color:var(--gold)">500 Mio. €+</span> jährliche Lobbying-Ausgaben in Deutschland<br>
+      <span style="color:var(--gold)">Seit 2022:</span> Pflicht-Lobbyregister beim Bundestag<br>
+      <span style="color:var(--gold)">107</span> MdBs wechselten 2005-2022 direkt in die Wirtschaft<br><br>
+      <span style="color:var(--cyan)">lobbycontrol.de · abgeordnetenwatch.de · bundestag.de</span>
+    </div>
+    <div class="pixel-divider"></div>
+    <div style="font-size:9px;color:var(--gold);margin-bottom:12px;text-align:center;">💬 DISKUSSION IM KURS:</div>
+    <div style="font-size:8px;color:var(--cyan);line-height:2.5;padding:12px;background:rgba(64,128,240,.08);border:2px solid var(--blue);">
+      1. Ist Lobbyismus grundsätzlich schlecht – oder demokratisch notwendig?<br>
+      2. Wo ist die Grenze zwischen legitimer Information und unzulässigem Druck?<br>
+      3. Welche Reformen würden das System fairer machen?<br>
+      4. Bewertet den Gesetzgebungsweg mit Effizienz vs. Legitimität:<br>
+         Wie effizient kann Demokratie sein, wenn Lobbyisten mitmachen?<br>
+      5. Welches Szenario hat euch am meisten überrascht – und warum?
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:20px;">
+      <button class="pixel-btn gold" onclick="resetGame()">↺ NOCHMAL SPIELEN</button>
+      <button class="pixel-btn purple" onclick="buildKnowledge();go('knowledge')">📖 LERNKARTE</button>
+    </div>
+    <div style="font-size:7px;color:var(--gray);text-align:center;margin-top:16px;line-height:2;">
+      SoWi EF NRW · Inhaltsfeld 2 · Alle Fakten Stand 2024
+    </div>
+  </div>`;
+  if(pCv){pCv.style.margin='0 auto';document.getElementById('final-cv').appendChild(pCv);}
+  go('final');
+}
+
+// ═══════════════════════════════════════════════════
+// KNOWLEDGE PAGE
+// ═══════════════════════════════════════════════════
+function buildKnowledge(){
+  document.getElementById('knowledge-content').innerHTML=`
+  <div class="panel">
+    <div class="panel-title">📖 LERNKARTE: LOBBYISMUS IN DEUTSCHLAND</div>
+    <div style="font-size:9px;color:var(--gray);margin-bottom:16px;">SoWi EF NRW · Inhaltsfeld 2 · Politische Strukturen, Prozesse und Partizipation</div>
+
+    <div class="know-section">
+      <div class="know-heading">1. WAS IST LOBBYISMUS?</div>
+      <div class="know-term">
+        <span class="know-term-name">▶ DEFINITION</span>
+        <div class="know-def">Lobbyismus bezeichnet die gezielte Einflussnahme organisierter Interessengruppen auf politische Entscheidungsträger. Der Begriff leitet sich vom englischen "lobby" ab – dem Vorraum des Parlaments, in dem früher Einfluss gesucht wurde.</div>
+      </div>
+      <div class="know-term">
+        <span class="know-term-name">▶ LEGITIMITÄT VON LOBBYISMUS</span>
+        <div class="know-def">Lobbyismus ist in demokratischen Systemen grundsätzlich legal und sogar demokratisch notwendig: Abgeordnete können nicht in allen Fachbereichen Experten sein. Interessengruppen liefern wichtige Informationen. Die Grenze liegt bei: finanziellen Zuwendungen, einseitiger Abhängigkeit, und mangelnder Transparenz.</div>
+        <div class="know-example">BEISPIEL: Ein Umweltverband, der einem Abgeordneten Klimadaten erklärt = legitim. Ein Konzern, der eine Reise finanziert und danach eine Gegenleistung erwartet = problematisch.</div>
+      </div>
+    </div>
+
+    <div class="know-section">
+      <div class="know-heading">2. FORMEN DES LOBBYISMUS</div>
+      <table class="know-table">
+        <tr><th>Form</th><th>Beschreibung</th><th>Beispiel</th></tr>
+        <tr><td>Direktlobbyismus</td><td>Persönliche Gespräche mit Abgeordneten, Ministerien</td><td>Meeting im Bundestag</td></tr>
+        <tr><td>Informationslobbyismus</td><td>Bereitstellung von (selektiven) Studien und Daten</td><td>Konzernfinanzierte Gutachten</td></tr>
+        <tr><td>Grassroots-Lobbying</td><td>Mobilisierung der Öffentlichkeit und Bürger</td><td>Petitionen, Demos</td></tr>
+        <tr><td>Drehtür-Prinzip</td><td>Wechsel zwischen Politik und Wirtschaft</td><td>Ex-Minister als Konzernberater</td></tr>
+        <tr><td>Finanzielle Zuwendungen</td><td>Parteispenden, Sponsoring (legale Grauzone)</td><td>Parteispenden unter 50.000 €</td></tr>
+        <tr><td>Informelle Netzwerke</td><td>Abendessen, Golfplätze, Empfänge</td><td>„Informationsreisen"</td></tr>
+      </table>
+    </div>
+
+    <div class="know-section">
+      <div class="know-heading">3. SCHLÜSSELBEGRIFFE</div>
+      <div class="know-term">
+        <span class="know-term-name">▶ DREHTÜR-PRINZIP (Revolving Door)</span>
+        <div class="know-def">Wenn Politiker nach ihrem Mandat in die Wirtschaft wechseln, für die sie vorher Entscheidungen getroffen haben – oder umgekehrt. Schafft Loyalitäten, die schon während des Mandats wirken.</div>
+        <div class="know-example">FAKT: 107 MdBs wechselten 2005-2022 direkt nach ihrem Mandat in die Wirtschaft. Für Minister gilt seit 2015 eine Karenzzeit von 18 Monaten.</div>
+      </div>
+      <div class="know-term">
+        <span class="know-term-name">▶ REGULATORY CAPTURE</span>
+        <div class="know-def">Wenn die zu regulierenden Akteure (z.B. Konzerne) so viel Einfluss auf die Regulierer (z.B. Abgeordnete, Ministerien) gewinnen, dass Gesetze zu ihren Gunsten und gegen das Allgemeinwohl geschrieben werden.</div>
+        <div class="know-example">BEISPIEL: Von 20 Studien zur Finanztransaktionssteuer im Finanzausschuss wurden 17 von der Finanzindustrie finanziert. Nur 3 kamen von unabhängigen Instituten.</div>
+      </div>
+      <div class="know-term">
+        <span class="know-term-name">▶ AGENDA-SETTING</span>
+        <div class="know-def">Die Macht zu bestimmen, WORÜBER politisch debattiert wird – und worüber nicht. Wer die Agenda setzt, hat Macht, auch ohne direkten Druck auszuüben.</div>
+      </div>
+    </div>
+
+    <div class="know-section">
+      <div class="know-heading">4. ZAHLEN & FAKTEN</div>
+      <div class="stats-trio">
+        <div class="stat-card"><span class="stat-big">7.200+</span><span class="stat-lbl">registrierte Interessengruppen beim Bundestag (2024)</span></div>
+        <div class="stat-card"><span class="stat-big">500 Mio.</span><span class="stat-lbl">Euro jährliche Lobbying-Ausgaben in Deutschland</span></div>
+        <div class="stat-card"><span class="stat-big">107</span><span class="stat-lbl">MdBs wechselten 2005–2022 direkt in die Wirtschaft</span></div>
+      </div>
+      <div class="stats-trio">
+        <div class="stat-card"><span class="stat-big">2022</span><span class="stat-lbl">Einführung des Pflicht-Lobbyregisters in Deutschland</span></div>
+        <div class="stat-card"><span class="stat-big">8,2 Mio.</span><span class="stat-lbl">Euro gibt Meta jährlich für EU-Lobbying aus</span></div>
+        <div class="stat-card"><span class="stat-big">180+</span><span class="stat-lbl">MdBs nahmen 2021 an finanzierten „Informationsreisen" teil</span></div>
+      </div>
+    </div>
+
+    <div class="know-section">
+      <div class="know-heading">5. KONTROLLE & TRANSPARENZ</div>
+      <table class="know-table">
+        <tr><th>Instrument</th><th>Funktion</th><th>Bewertung</th></tr>
+        <tr><td>Lobbyregister (seit 2022)</td><td>Pflichtregistrierung aller Lobbygruppen beim Bundestag</td><td style="color:var(--orange)">Fortschritt, aber lückenhaft</td></tr>
+        <tr><td>AbgeordnetenWatch</td><td>Transparenzportal: Spenden, Nebeneinkünfte, Abstimmungen</td><td style="color:var(--green)">Sehr effektiv</td></tr>
+        <tr><td>LobbyControl</td><td>NGO: Recherche und Kampagnen gegen illegitimen Lobbyismus</td><td style="color:var(--green)">Wichtige Kontrollinstanz</td></tr>
+        <tr><td>Karenzzeit für Minister</td><td>18 Monate Wartefrist vor Wechsel in betroffene Branche</td><td style="color:var(--orange)">Nur für Minister, schwer durchsetzbar</td></tr>
+        <tr><td>Parteispendenrecht</td><td>Spenden über 50.000 € sofort veröffentlichen</td><td style="color:var(--red)">Darunter: Grauzone</td></tr>
+      </table>
+    </div>
+
+    <div class="know-section">
+      <div class="know-heading">6. EFFIZIENZ VS. LEGITIMITÄT</div>
+      <div class="know-term">
+        <span class="know-term-name">▶ EFFIZIENZ im Kontext von Lobbyismus</span>
+        <div class="know-def">Lobbyismus kann politische Prozesse beschleunigen – Konzerne liefern Expertise, vereinfachen Entscheidungen. ABER: Schnelle, effiziente Entscheidungen unter Lobbydruck können demokratische Legitimität kosten.</div>
+      </div>
+      <div class="know-term">
+        <span class="know-term-name">▶ LEGITIMITÄT im Kontext von Lobbyismus</span>
+        <div class="know-def">Legitime politische Entscheidungen entstehen durch transparente, demokratisch kontrollierte Verfahren unter Beteiligung aller relevanten Stimmen – nicht nur der finanzstärksten Lobbygruppen.</div>
+        <div class="know-example">KERNFRAGE: Wenn ein Gesetz schnell und effizient unter Lobbydruck entsteht – ist es deshalb weniger legitim? Wie viel Einfluss darf eine Interessengruppe auf demokratische Entscheidungen haben?</div>
+      </div>
+    </div>
+
+    <div class="know-section">
+      <div class="know-heading">7. WISSENSFRAGEN</div>
+      <div class="quiz-wrap" id="qwrap"></div>
+    </div>
+
+    <div class="pixel-divider"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+      <button class="pixel-btn gold" onclick="${G.player?'buildMap();go(\'map\')':'go(\'title\')'}">◀ ZURÜCK ZUM SPIEL</button>
+      <button class="pixel-btn" onclick="go('title')">🏠 TITELBILDSCHIRM</button>
+    </div>
+    <div style="font-size:7px;color:var(--gray);text-align:center;margin-top:12px;line-height:2;">
+      Quellen: lobbycontrol.de · abgeordnetenwatch.de · bundestag.de · transparency.de · Correctiv.org
+    </div>
+  </div>`;
+  buildQuiz();
+}
+
+const QUIZ=[
+  {q:'Was versteht man unter dem „Drehtür-Prinzip"?',
+   opts:['A: Eine Technik der Bürgerbeteiligung','B: Der Wechsel von Politikern in die Wirtschaft (oder umgekehrt)','C: Das Rotationsprinzip bei Ausschussmitgliedschaften','D: Ein Begriff aus dem Baurecht'],
+   ans:1,learn:'Das Drehtür-Prinzip (Revolving Door) beschreibt den Wechsel von Politikern in die Wirtschaft, für die sie vorher Entscheidungen getroffen haben. In Deutschland gilt für Minister eine Karenzzeit von 18 Monaten.'},
+  {q:'Seit wann gibt es in Deutschland ein Pflicht-Lobbyregister?',
+   opts:['A: 2010','B: 2015','C: 2022','D: Es gibt noch keins'],
+   ans:2,learn:'Das verpflichtende Lobbyregister beim Bundestag wurde 2022 eingeführt – Deutschland war eines der letzten EU-Länder. Kritiker halten es für noch unvollständig.'},
+  {q:'Was bedeutet „Regulatory Capture"?',
+   opts:['A: Staatliche Übernahme von Unternehmen','B: Wenn Regulierte ihre Regulierer durch Einfluss kontrollieren','C: Ein Begriff für staatliche Überwachung','D: Die Kontrolle der Polizei durch den Staat'],
+   ans:1,learn:'Regulatory Capture: Wenn die zu regulierenden Akteure (z.B. Konzerne) so viel Einfluss gewinnen, dass Gesetze zu ihren Gunsten und gegen das Allgemeinwohl geschrieben werden.'},
+  {q:'Was ist Lobbyismus grundsätzlich?',
+   opts:['A: In Deutschland verboten','B: Legal und in einer Demokratie auch nötig','C: Nur in autoritären Systemen relevant','D: Ausschließlich eine Form der Korruption'],
+   ans:1,learn:'Lobbyismus ist legal und demokratisch notwendig – Abgeordnete brauchen Expertise. Die Grenze liegt bei finanziellen Zuwendungen, Abhängigkeit und mangelnder Transparenz.'}
+];
+let quizState={};
+
+function buildQuiz(){
+  const wrap=document.getElementById('qwrap');if(!wrap)return;
+  wrap.innerHTML='';
+  QUIZ.forEach((q,qi)=>{
+    const div=document.createElement('div');
+    div.style.marginBottom='20px';
+    div.innerHTML=`<div class="quiz-q">${qi+1}. ${q.q}</div>
+      ${q.opts.map((o,oi)=>`<button class="quiz-opt" id="qo-${qi}-${oi}" onclick="answerQuiz(${qi},${oi})">${o}</button>`).join('')}
+      <div id="qf-${qi}" style="display:none;" class="quiz-feedback"></div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function answerQuiz(qi,oi){
+  if(quizState[qi]!==undefined)return;
+  quizState[qi]=oi;
+  const q=QUIZ[qi];
+  for(let i=0;i<q.opts.length;i++){
+    const btn=document.getElementById(`qo-${qi}-${i}`);
+    if(i===q.ans)btn.classList.add('correct');
+    else if(i===oi&&oi!==q.ans)btn.classList.add('wrong');
+  }
+  const fb=document.getElementById(`qf-${qi}`);
+  fb.style.display='block';
+  fb.style.borderColor=oi===q.ans?'var(--green)':'var(--red)';
+  fb.style.background=oi===q.ans?'rgba(64,192,64,.1)':'rgba(192,64,64,.1)';
+  fb.style.color=oi===q.ans?'var(--green)':'var(--white)';
+  fb.innerHTML=(oi===q.ans?'✓ RICHTIG! ':' ✗ FALSCH. ')+q.learn;
+}
+
+// ═══════════════════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════════════════
+function resetGame(){
+  Object.assign(G,{integrity:100,influence:10,money:0,done:[],choices:[],scene:null,player:null,
+    epilogueChoice:null,epiloguePath:null});
+  selChar=null;introIdx=0;epiSceneIdx=0;epiChoiceMade=false;quizState={};
+  buildTitle();go('title');
+}
+
+// ═══════════════════════════════════════════════════
+// GLOSSARY
+// ═══════════════════════════════════════════════════
+const GLOSSARY=[
+  {term:'Agenda-Setting',def:'Die Macht zu bestimmen, worüber politisch debattiert wird – und worüber nicht. Wer die Themen setzt, hat Einfluss, ohne direkten Druck auszuüben.',ex:'Wenn ein Konzern bewirkt, dass sein Thema ganz oben auf der politischen Tagesordnung steht, betreibt er Agenda-Setting.'},
+  {term:'Abgeordnete/r (MdB)',def:'Mitglied des Deutschen Bundestages. Direkt vom Volk gewählt, vertritt einen Wahlkreis und eine Partei. Hat das Recht, Gesetzentwürfe einzubringen und abzustimmen.',ex:'Jana Weber ist in diesem Spiel eine fiktive MdB für den Wahlkreis Köln-Nord.'},
+  {term:'Bestechung von Mandatsträgern',def:'Strafbar nach §108e StGB. Wer einem Abgeordneten Geld oder Vorteile für eine bestimmte Abstimmung anbietet oder annimmt, macht sich strafbar. Strafe: bis zu 5 Jahre Haft.',ex:'General Bremer bietet eine Parteispende für eine Zustimmung zum Waffenexport an – das ist genau dieser Straftatbestand.'},
+  {term:'Bundesrat',def:'Eines der fünf Verfassungsorgane Deutschlands. Vertritt die 16 Bundesländer auf Bundesebene. Bei bestimmten Gesetzen (Zustimmungsgesetze) hat er ein echtes Vetorecht.',ex:'Beim Heizkostenzuschussgesetz 2022 billigte der Bundesrat das Gesetz ohne Anrufung des Vermittlungsausschusses.'},
+  {term:'Bundestag',def:'Das deutsche Parlament. Besteht aus direkt gewählten Abgeordneten. Wichtigstes Legislativorgan – verabschiedet Gesetze, wählt den Bundeskanzler, kontrolliert die Regierung.',ex:'Im Spiel ist der Bundestag der Hauptschauplatz, an dem Lobbyisten Einfluss nehmen wollen.'},
+  {term:'Corporate Lobbying',def:'Interessenvertretung durch große Unternehmen oder Unternehmensverbände. Ziel: Gesetze und Regulierungen im eigenen wirtschaftlichen Interesse beeinflussen.',ex:'PharmaDeutsch, der Gasverband und die Deutsche Großbank sind Beispiele für Corporate Lobbying im Spiel.'},
+  {term:'Direktlobbyismus',def:'Die direkteste Form: Persönliche Gespräche zwischen Lobbyisten und Abgeordneten oder Ministeriumsmitarbeitern, um politische Positionen zu beeinflussen.',ex:'Dr. Hartmanns Meeting im Wirtschaftsministerium ist klassischer Direktlobbyismus.'},
+  {term:'Drehtür-Prinzip (Revolving Door)',def:'Der Wechsel von Politikern in die Wirtschaft (für die sie vorher Entscheidungen getroffen haben) – oder umgekehrt. Schafft Loyalitäten und Interessenkonflikte.',ex:'Dr. Fischer war Pharmakologin an der Uni, wechselte dann zu PharmaDeutsch. Für Minister gilt eine Karenzzeit von 18 Monaten.'},
+  {term:'Effizienz (politisch)',def:'Bezeichnet, ob eine politische Entscheidung ihr Ziel schnell, zielgenau und mit angemessenem Aufwand erreicht. In der Demokratie oft im Spannungsfeld mit Legitimität.',ex:'War das Heizkostenzuschussgesetz effizient? Es dauerte 4 Monate – für akut frierenden Familien möglicherweise zu lang.'},
+  {term:'Fraktion',def:'Zusammenschluss von Abgeordneten derselben oder ähnlicher Parteien im Parlament. Fraktionen können Gesetzentwürfe einbringen und haben mehr Rechte als einzelne Abgeordnete.',ex:'Die Koalitionsfraktionen SPD, Grüne und FDP brachten 2022 gemeinsam den Heizkostenzuschuss-Entwurf ein.'},
+  {term:'Grassroots-Lobbying',def:'Mobilisierung der breiten Bevölkerung für politische Ziele einer Interessengruppe. Erscheint als Bürgerbewegung, ist aber oft professionell organisiert.',ex:'Wenn ein Konzern Bürger dazu bringt, Petitionen für seine Interessen zu unterschreiben, ist das Grassroots-Lobbying.'},
+  {term:'Informationslobbyismus',def:'Die subtilste Form: Bereitstellung von (selektiven) Studien, Daten und Expertenwissen, um das Framing einer Debatte zu kontrollieren.',ex:'MetaSpheres Angebot, Jana exklusiven Datenzugang zu geben, ist Informationslobbyismus.'},
+  {term:'Interessengruppe',def:'Eine Organisation, die die Interessen einer bestimmten Gruppe gegenüber dem Staat vertritt. Kann ein Wirtschaftsverband, eine NGO, eine Gewerkschaft oder ein Unternehmen sein.',ex:'Der Gasverband Deutschland, ver.di und Amnesty International sind alle Interessengruppen – mit sehr unterschiedlichen Mitteln.'},
+  {term:'Karenzzeit',def:'Wartefrist, die bestimmte Amtsträger einhalten müssen, bevor sie in die Privatwirtschaft wechseln dürfen. Soll das Drehtür-Prinzip begrenzen.',ex:'In Deutschland gilt für Bundesminister eine Karenzzeit von 18 Monaten. Für einfache Abgeordnete gibt es keine Pflicht-Karenzzeit.'},
+  {term:'Legitimität (politisch)',def:'Bezeichnet, ob eine politische Entscheidung auf dem richtigen Weg zustande kam: regelkonform, transparent, unter Beteiligung aller relevanten Stimmen.',ex:'Der Gesetzgebungsweg beim Heizkostenzuschuss war legitim: Ausschussanhörung, Bundesratsbeteiligung, öffentliche Abstimmung.'},
+  {term:'Lobbyismus',def:'Die gezielte Einflussnahme organisierter Interessengruppen auf politische Entscheidungsträger. In Demokratien legal und grundsätzlich legitim – solange transparent.',ex:'Alle fünf Szenarien dieses Spiels zeigen verschiedene Formen des Lobbyismus.'},
+  {term:'Lobbyregister',def:'Seit 2022 müssen sich alle Interessengruppen, die Einfluss auf den Bundestag oder die Bundesregierung nehmen wollen, in einem öffentlichen Register eintragen.',ex:'Der Gasverband ist im Lobbyregister eingetragen und gibt an, 820.000 € pro Jahr für Lobbying auszugeben.'},
+  {term:'Mandat',def:'Der politische Auftrag, den ein Abgeordneter durch die Wahl erhält. Ein freies Mandat bedeutet: Abgeordnete sind nur ihrem Gewissen verpflichtet – nicht ihrer Partei oder Lobbyisten.',ex:'Jana Weber hat ein freies Mandat. Trotzdem versuchen Lobbyisten, ihre Entscheidungen zu beeinflussen.'},
+  {term:'Parteispende',def:'Geldleistung an eine politische Partei. Spenden über 50.000 € müssen sofort veröffentlicht werden. Darunter gibt es eine Grauzone, die systematisch genutzt wird.',ex:'General Bremers Angebot einer Wahlkampfspende ist eine klassische (und hier strafbare) Form der Einflussnahme über Parteispenden.'},
+  {term:'Regulatory Capture',def:'Wenn Regulierte (z.B. Konzerne) so viel Einfluss auf ihre Regulierer (Ministerien, Abgeordnete) gewinnen, dass Gesetze zu ihren Gunsten geschrieben werden.',ex:'Im Finanzausschuss waren 17 von 20 Studien zur Finanztransaktionssteuer von der Finanzbranche finanziert – ein klassisches Capture-Muster.'},
+  {term:'Transparenz (politisch)',def:'Das Prinzip, dass politische Entscheidungen und die daran beteiligten Akteure und Interessen öffentlich einsehbar sein sollen.',ex:'AbgeordnetenWatch und das Lobbyregister sind Instrumente zur Herstellung von Transparenz in der deutschen Politik.'},
+  {term:'Vermittlungsausschuss',def:'Gemeinsames Gremium von Bundestag und Bundesrat. Tritt zusammen, wenn der Bundesrat einem Gesetz widerspricht und versucht, einen Kompromiss zu finden.',ex:'Beim Heizkostenzuschussgesetz wurde der Vermittlungsausschuss nicht angerufen – der Bundesrat billigte direkt.'},
+  {term:'Wahlkampffinanzierung',def:'Wie Parteien ihre Wahlkämpfe finanzieren: durch staatliche Parteienfinanzierung, Mitgliedsbeiträge und Spenden. Transparenz ist gesetzlich vorgeschrieben – mit Lücken.',ex:'Spenden unter 50.000 € müssen nicht sofort gemeldet werden. Diese Grauzone nutzen Lobbyisten systematisch.'},
+];
+
+function openGlossary(){
+  buildGlossaryEntries('');
+  document.getElementById('g-search').value='';
+  document.getElementById('glossary-overlay').classList.add('open');
+  document.getElementById('g-search').focus();
+}
+
+function closeGlossary(){
+  document.getElementById('glossary-overlay').classList.remove('open');
+}
+
+function filterGlossary(q){
+  buildGlossaryEntries(q.toLowerCase().trim());
+}
+
+function buildGlossaryEntries(filter){
+  const container=document.getElementById('g-entries');
+  const filtered=filter
+    ?GLOSSARY.filter(g=>g.term.toLowerCase().includes(filter)||g.def.toLowerCase().includes(filter))
+    :GLOSSARY;
+
+  if(filtered.length===0){
+    container.innerHTML=`<div style="font-size:9px;color:var(--gray);text-align:center;padding:20px;">
+      Kein Begriff gefunden für „${filter}"</div>`;
+    return;
+  }
+
+  // Group by first letter if no filter
+  if(!filter){
+    const byLetter={};
+    filtered.forEach(g=>{
+      const l=g.term[0].toUpperCase();
+      if(!byLetter[l])byLetter[l]=[];
+      byLetter[l].push(g);
+    });
+    container.innerHTML=Object.keys(byLetter).sort().map(l=>`
+      <div class="g-letter">— ${l} —</div>
+      ${byLetter[l].map(g=>termHTML(g,'')).join('')}
+    `).join('');
+  } else {
+    container.innerHTML=`
+      <div style="font-size:8px;color:var(--gray);margin-bottom:12px;">${filtered.length} Ergebnis${filtered.length!==1?'se':''} für „${filter}"</div>
+      ${filtered.map(g=>termHTML(g,filter)).join('')}`;
+  }
+}
+
+function termHTML(g,hl){
+  const name=hl?g.term.replace(new RegExp(hl,'gi'),m=>`<span style="color:var(--gold)">${m}</span>`):g.term;
+  return `<div class="g-term">
+    <span class="g-term-name">${name}</span>
+    <div class="g-term-def">${g.def}</div>
+    ${g.ex?`<div class="g-term-ex">▶ BEISPIEL: ${g.ex}</div>`:''}
+  </div>`;
+}
+
+// Close on overlay click outside box
+document.getElementById('glossary-overlay').addEventListener('click',e=>{
+  if(e.target===document.getElementById('glossary-overlay'))closeGlossary();
+});
+
+// Close on Escape
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeGlossary();
+});
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+buildTitle();
+buildCharSelect();
+</script>
+
+</body>
+</html>
