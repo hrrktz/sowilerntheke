@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -22,22 +21,22 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,'Helvetica
 
 /* HEADER */
 .header{background:linear-gradient(135deg,#1a0830 0%,#3a1060 100%);padding:24px 24px 20px;
-position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3);}
+  position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3);}
 .header h1{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.3px;}
 .header p{font-size:13px;color:rgba(255,255,255,.7);margin-top:3px;}
 .header-badge{display:inline-block;background:rgba(255,255,255,.15);color:#fff;
-font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;margin-top:8px;
-letter-spacing:.5px;}
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;margin-top:8px;
+  letter-spacing:.5px;}
 
 /* NAV */
-.nav{display:flex;background:var(–white);border-bottom:2px solid var(–border);
-overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:84px;z-index:99;}
+.nav{display:flex;background:var(--white);border-bottom:2px solid var(--border);
+  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:84px;z-index:99;}
 .nav::-webkit-scrollbar{display:none;}
 .nav-btn{flex-shrink:0;padding:14px 18px;border:none;background:transparent;
-font-family:inherit;font-size:13px;font-weight:600;color:var(–light);cursor:pointer;
-border-bottom:3px solid transparent;margin-bottom:-2px;min-height:48px;
--webkit-tap-highlight-color:transparent;white-space:nowrap;}
-.nav-btn.active{color:var(–pu);border-bottom-color:var(–pu);}
+  font-family:inherit;font-size:13px;font-weight:600;color:var(--light);cursor:pointer;
+  border-bottom:3px solid transparent;margin-bottom:-2px;min-height:48px;
+  -webkit-tap-highlight-color:transparent;white-space:nowrap;}
+.nav-btn.active{color:var(--pu);border-bottom-color:var(--pu);}
 
 /* PANELS */
 .panel{display:none;padding:20px 24px;max-width:820px;margin:0 auto;}
@@ -45,67 +44,67 @@ border-bottom:3px solid transparent;margin-bottom:-2px;min-height:48px;
 
 /* SECTION */
 .sec-title{font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px;}
-.sec-sub{font-size:14px;color:var(–light);margin-bottom:20px;padding-bottom:16px;
-border-bottom:1px solid var(–border);}
+.sec-sub{font-size:14px;color:var(--light);margin-bottom:20px;padding-bottom:16px;
+  border-bottom:1px solid var(--border);}
 
 /* CARD */
-.card{background:var(–white);border:1px solid var(–border);border-radius:var(–radius);
-padding:20px;margin-bottom:16px;box-shadow:var(–shadow);}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;margin-bottom:16px;box-shadow:var(--shadow);}
 .card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
-color:var(–light);margin-bottom:12px;}
+  color:var(--light);margin-bottom:12px;}
 
 /* HIGHLIGHT */
 .hl{border-radius:8px;padding:12px 16px;margin:10px 0;font-size:14px;line-height:1.7;}
 
 /* EXPANDABLE */
-.exp-btn{width:100%;padding:14px 16px;background:var(–bg);border:none;border-top:1px solid var(–border);
-font-family:inherit;font-size:14px;font-weight:600;color:var(–light);cursor:pointer;
-text-align:left;display:flex;justify-content:space-between;align-items:center;
-min-height:48px;-webkit-tap-highlight-color:transparent;}
+.exp-btn{width:100%;padding:14px 16px;background:var(--bg);border:none;border-top:1px solid var(--border);
+  font-family:inherit;font-size:14px;font-weight:600;color:var(--light);cursor:pointer;
+  text-align:left;display:flex;justify-content:space-between;align-items:center;
+  min-height:48px;-webkit-tap-highlight-color:transparent;}
 .exp-btn .arr{transition:transform .2s;font-size:16px;}
 .exp-btn.open .arr{transform:rotate(180deg);}
-.exp-body{display:none;padding:16px;background:#faf9f7;border-top:1px solid var(–border);
-font-size:14px;line-height:1.8;}
+.exp-body{display:none;padding:16px;background:#faf9f7;border-top:1px solid var(--border);
+  font-size:14px;line-height:1.8;}
 .exp-body.open{display:block;}
 .exp-body p+p{margin-top:10px;}
 
 /* FLASHCARDS */
 .fc-grid{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
-.fc{background:var(–white);border:1px solid var(–border);border-radius:var(–radius);
-box-shadow:var(–shadow);overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.fc{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;-webkit-tap-highlight-color:transparent;}
 .fc-front{padding:18px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;min-height:64px;}
 .fc-front-left{flex:1;}
 .fc-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
-margin-bottom:4px;display:block;}
+  margin-bottom:4px;display:block;}
 .fc-term{font-size:15px;font-weight:700;line-height:1.35;}
-.fc-arrow{flex-shrink:0;font-size:18px;color:var(–light);transition:transform .2s;}
+.fc-arrow{flex-shrink:0;font-size:18px;color:var(--light);transition:transform .2s;}
 .fc.open .fc-arrow{transform:rotate(180deg);}
-.fc-back{display:none;padding:14px 16px;border-top:1px solid var(–border);
-font-size:14px;line-height:1.75;}
+.fc-back{display:none;padding:14px 16px;border-top:1px solid var(--border);
+  font-size:14px;line-height:1.75;}
 .fc-back-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
-margin-bottom:6px;display:block;}
+  margin-bottom:6px;display:block;}
 .fc.open .fc-back{display:block;}
-.fc-hint{font-size:11px;color:var(–light);margin-top:2px;display:block;}
+.fc-hint{font-size:11px;color:var(--light);margin-top:2px;display:block;}
 
 /* TASKS */
-.task-box{border:1px solid var(–border);border-radius:var(–radius);margin-bottom:14px;
-overflow:hidden;box-shadow:var(–shadow);}
-.task-head{padding:16px 18px;background:var(–white);display:flex;gap:14px;align-items:flex-start;}
+.task-box{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;
+  overflow:hidden;box-shadow:var(--shadow);}
+.task-head{padding:16px 18px;background:var(--white);display:flex;gap:14px;align-items:flex-start;}
 .task-num{flex-shrink:0;width:38px;height:38px;border-radius:50%;display:flex;
-align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;margin-top:2px;}
+  align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;margin-top:2px;}
 .task-info{flex:1;}
 .task-afb{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
 .task-text{font-size:15px;line-height:1.6;font-weight:600;}
-.task-pts{font-size:12px;color:var(–light);margin-top:5px;}
+.task-pts{font-size:12px;color:var(--light);margin-top:5px;}
 .task-op{display:inline-block;padding:3px 10px;border-radius:10px;font-size:12px;
-font-weight:700;margin-top:8px;}
+  font-weight:700;margin-top:8px;}
 
 /* SCAFFOLD TABLE */
 .tbl{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px;}
-.tbl th{padding:8px 12px;background:var(–pu-l);border:1px solid var(–pu-b);
-font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
-color:var(–pu);text-align:left;}
-.tbl td{padding:10px 12px;border:1px solid var(–border);line-height:1.6;vertical-align:top;}
+.tbl th{padding:8px 12px;background:var(--pu-l);border:1px solid var(--pu-b);
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--pu);text-align:left;}
+.tbl td{padding:10px 12px;border:1px solid var(--border);line-height:1.6;vertical-align:top;}
 .tbl tr:nth-child(even) td{background:#faf9f7;}
 
 /* COMPARE */
@@ -114,59 +113,58 @@ color:var(–pu);text-align:left;}
 .compare-col{border-radius:8px;padding:14px;border:1px solid;}
 
 /* AMPEL */
-.ampel-card{background:var(–white);border:1px solid var(–border);border-radius:var(–radius);
-padding:20px;margin-bottom:14px;box-shadow:var(–shadow);}
+.ampel-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;margin-bottom:14px;box-shadow:var(--shadow);}
 .ampel-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
 .ampel-title{font-size:15px;font-weight:700;flex:1;}
-.ampel-frage{font-size:14px;line-height:1.7;color:var(–text);margin-bottom:16px;
-padding:12px 14px;background:var(–bg);border-radius:8px;border-left:3px solid var(–border);}
+.ampel-frage{font-size:14px;line-height:1.7;color:var(--text);margin-bottom:16px;
+  padding:12px 14px;background:var(--bg);border-radius:8px;border-left:3px solid var(--border);}
 .ampel-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.ampel-btn{padding:14px 8px;border:2px solid var(–border);border-radius:8px;background:var(–white);
-font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;text-align:center;
--webkit-tap-highlight-color:transparent;transition:all .15s;line-height:1.5;min-height:48px;}
-.ampel-btn.rot.active{background:#fdf2f1;border-color:var(–re);color:var(–re);}
-.ampel-btn.gelb.active{background:#fdf8ee;border-color:var(–go);color:var(–go);}
-.ampel-btn.gruen.active{background:var(–gr-l);border-color:var(–gr);color:var(–gr);}
+.ampel-btn{padding:14px 8px;border:2px solid var(--border);border-radius:8px;background:var(--white);
+  font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;text-align:center;
+  -webkit-tap-highlight-color:transparent;transition:all .15s;line-height:1.5;min-height:48px;}
+.ampel-btn.rot.active{background:#fdf2f1;border-color:var(--re);color:var(--re);}
+.ampel-btn.gelb.active{background:#fdf8ee;border-color:var(--go);color:var(--go);}
+.ampel-btn.gruen.active{background:var(--gr-l);border-color:var(--gr);color:var(--gr);}
 .ampel-result{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;
-font-weight:600;display:none;line-height:1.6;}
+  font-weight:600;display:none;line-height:1.6;}
 .ampel-result.show{display:block;}
 .summary-row{display:flex;align-items:center;gap:12px;padding:10px 0;
-border-bottom:1px solid var(–border);font-size:14px;}
+  border-bottom:1px solid var(--border);font-size:14px;}
 .summary-row:last-child{border-bottom:none;}
-.summary-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;background:var(–border);}
+.summary-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;background:var(--border);}
 
 /* OPERATOR TABLE */
 .op-tbl{width:100%;border-collapse:collapse;font-size:14px;}
-.op-tbl th{padding:8px 12px;background:var(–bg);border-bottom:2px solid var(–border);
-font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(–light);text-align:left;}
-.op-tbl td{padding:10px 12px;border-bottom:1px solid var(–border);line-height:1.55;vertical-align:top;}
+.op-tbl th{padding:8px 12px;background:var(--bg);border-bottom:2px solid var(--border);
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--light);text-align:left;}
+.op-tbl td{padding:10px 12px;border-bottom:1px solid var(--border);line-height:1.55;vertical-align:top;}
 .op-tbl tr:last-child td{border-bottom:none;}
 .afb{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;}
 
 /* TIMELINE */
-.tl-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(–border);}
+.tl-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);}
 .tl-item:last-child{border-bottom:none;}
-.tl-y{flex-shrink:0;font-size:12px;font-weight:700;color:var(–pu);width:90px;padding-top:2px;}
+.tl-y{flex-shrink:0;font-size:12px;font-weight:700;color:var(--pu);width:90px;padding-top:2px;}
 .tl-t{font-size:14px;line-height:1.6;}
 
 /* FOOTER */
-.footer{font-size:12px;color:var(–light);text-align:center;margin-top:28px;
-padding-top:14px;border-top:1px solid var(–border);}
+.footer{font-size:12px;color:var(--light);text-align:center;margin-top:28px;
+  padding-top:14px;border-top:1px solid var(--border);}
 
 /* BADGE */
 .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:14px;
-font-size:12px;font-weight:700;margin-bottom:12px;}
+  font-size:12px;font-weight:700;margin-bottom:12px;}
 
 /* RESET BTN */
-.reset-btn{background:var(–white);border:1px solid var(–border);border-radius:8px;
-padding:12px 20px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
-color:var(–text);margin-top:12px;-webkit-tap-highlight-color:transparent;}
+.reset-btn{background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:12px 20px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
+  color:var(--text);margin-top:12px;-webkit-tap-highlight-color:transparent;}
 
 /* MERKSATZ */
-.merksatz{background:#fffdf0;border-left:4px solid var(–go);border-radius:0 8px 8px 0;
-padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
+.merksatz{background:#fffdf0;border-left:4px solid var(--go);border-radius:0 8px 8px 0;
+  padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
 </style>
-
 </head>
 <body>
 
@@ -189,7 +187,6 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
 <!-- ══════════════════════════════
      1. RECHTSEXTREMISMUS
 ══════════════════════════════ -->
-
 <div class="panel active" id="panel-re">
   <div class="sec-title">Rechtsextremismus</div>
   <div class="sec-sub">Merkmale, Erscheinungsformen und Fallbeispiele</div>
@@ -255,7 +252,6 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
 <!-- ══════════════════════════════
      2. WEHRHAFTE DEMOKRATIE
 ══════════════════════════════ -->
-
 <div class="panel" id="panel-wd">
   <div class="sec-title">Wehrhafte Demokratie</div>
   <div class="sec-sub">Konzept, historische Grundlage und Instrumente</div>
@@ -302,7 +298,7 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
       </div>
     </div>
     <div class="hl" style="background:#fff8e8;border-left:4px solid var(--go);margin-top:10px;">
-      <strong>Beide Kriterien müssen unbedingt erfüllt sein!</strong><br>
+      <strong>Beide Kriterien müssen kumulativ erfüllt sein!</strong><br>
       NPD 2017: Kriterium 1 ✓ verfassungsfeindlich · Kriterium 2 ✗ zu bedeutungslos → Kein Verbot
     </div>
   </div>
@@ -317,7 +313,6 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
 <!-- ══════════════════════════════
      3. PARTEIVERBOT
 ══════════════════════════════ -->
-
 <div class="panel" id="panel-pv">
   <div class="sec-title">Das Parteiverbotsverfahren</div>
   <div class="sec-sub">NPD-Verbotsverfahren 2017 und Finanzierungsausschluss 2024</div>
@@ -395,7 +390,6 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
 <!-- ══════════════════════════════
      4. EFFIZIENZ & LEGITIMITÄT
 ══════════════════════════════ -->
-
 <div class="panel" id="panel-eu">
   <div class="sec-title">Effizienz & Legitimität</div>
   <div class="sec-sub">Die zwei Urteilskategorien für AFB III</div>
@@ -433,18 +427,47 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
   </div>
 
   <div class="card">
-    <div class="card-title">✍️ Pflichtstruktur für einen Urteilsabsatz (AFB III)</div>
-    <table class="tbl">
+    <div class="card-title">✍️ Struktur eines Urteilsabsatzes (AFB III)</div>
+
+    <!-- EINLEITUNG -->
+    <div style="background:#1a1a1a;color:#fff;font-size:11px;font-weight:700;letter-spacing:.6px;
+      padding:6px 12px;border-radius:6px 6px 0 0;margin-bottom:0;">── EINLEITUNG</div>
+    <table class="tbl" style="margin-top:0;border-top:none;">
       <thead><tr><th>Schritt</th><th>Inhalt</th><th>Formulierung</th></tr></thead>
       <tbody>
-        <tr><td><strong>1. Einstieg</strong></td><td>Problem benennen</td><td>„Die Entscheidung / Maßnahme / Instrument X ist aus zwei Perspektiven zu bewerten..."</td></tr>
-        <tr><td><strong>2. Legitimität</strong></td><td>Rechtmäßigkeit bewerten</td><td>„Im Hinblick auf die Legitimität ist festzuhalten, dass..."</td></tr>
-        <tr><td><strong>3. Effizienz</strong></td><td>Wirksamkeit bewerten</td><td>„Im Hinblick auf die Effizienz fällt die Bewertung [anders/kritischer/positiver] aus, weil..."</td></tr>
-        <tr><td><strong>4. Gegenargument</strong></td><td>Andere Perspektive einbeziehen</td><td>„Kritiker/Befürworter hingegen argumentieren, dass..."</td></tr>
-        <tr><td><strong>5. Weiterentwicklung</strong></td><td>Alternative / Ergänzung</td><td>„Als Alternative / Weiterentwicklung ist X zu nennen, der/die..."</td></tr>
-        <tr><td><strong>6. Fazit</strong></td><td>Abwägendes Urteil</td><td>„Abwägend lässt sich urteilen, dass..."</td></tr>
+        <tr><td><strong>1. Einstieg</strong></td><td>Problem benennen</td><td>„Die Entscheidung X ist aus zwei Perspektiven zu bewerten..."</td></tr>
       </tbody>
     </table>
+
+    <!-- HAUPTTEIL -->
+    <div style="background:#1a1a1a;color:#fff;font-size:11px;font-weight:700;letter-spacing:.6px;
+      padding:6px 12px;margin-top:10px;margin-bottom:0;">── HAUPTTEIL</div>
+    <table class="tbl" style="margin-top:0;border-top:none;">
+      <thead><tr><th>Schritt</th><th>Inhalt</th><th>Formulierung</th></tr></thead>
+      <tbody>
+        <tr><td><strong>2. Legitimität</strong></td><td>Rechtmäßigkeit bewerten</td><td>„Im Hinblick auf die Legitimität ist festzuhalten, dass..."</td></tr>
+        <tr><td><strong>3. Effizienz</strong></td><td>Wirksamkeit bewerten</td><td>„Im Hinblick auf die Effizienz fällt die Bewertung [anders/kritischer] aus, weil..."</td></tr>
+        <tr><td><strong>4. Gegenargument</strong></td><td>Andere Perspektive</td><td>„Kritiker/Befürworter hingegen argumentieren, dass..."</td></tr>
+        <tr><td><strong>5. Weiterentwicklung</strong></td><td>Alternative einbeziehen</td><td>„Als Alternative ist X zu nennen, der/die..."</td></tr>
+      </tbody>
+    </table>
+
+    <!-- FAZIT -->
+    <div style="background:#1a1a1a;color:#fff;font-size:11px;font-weight:700;letter-spacing:.6px;
+      padding:6px 12px;margin-top:10px;margin-bottom:0;">── FAZIT</div>
+    <table class="tbl" style="margin-top:0;border-top:none;">
+      <thead><tr><th>Schritt</th><th>Inhalt</th><th>Formulierung</th></tr></thead>
+      <tbody>
+        <tr><td><strong>6. Fazit</strong></td><td>Abwägendes Urteil</td><td>„<strong>Abwägend lässt sich urteilen, dass...</strong>"</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Darstellungsleistung -->
+    <div style="margin-top:12px;padding:10px 14px;background:#f8f8f8;border:1px solid var(--border);
+      border-radius:8px;font-size:13px;color:var(--light);line-height:1.7;">
+      ⚠️ <strong>Darstellungsleistung:</strong> Schreibt in vollständigen Sätzen · im Präsens ·
+      mit korrekter Rechtschreibung und logischem Aufbau. Dies wird bei der Bewertung mitbewertet.
+    </div>
   </div>
 
   <div class="card">
@@ -487,7 +510,6 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
 <!-- ══════════════════════════════
      5. FLASHCARDS
 ══════════════════════════════ -->
-
 <div class="panel" id="panel-fc">
   <div class="sec-title">Begriffe üben</div>
   <div class="sec-sub">Tippe auf eine Karte – Erklärung erscheint. Nochmal tippen zum Zurückklappen.</div>
@@ -502,7 +524,6 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
 <!-- ══════════════════════════════
      6. AUFGABEN
 ══════════════════════════════ -->
-
 <div class="panel" id="panel-aufg">
   <div class="sec-title">Aufgaben</div>
   <div class="sec-sub">Im Klausurformat · Erst selbst versuchen, dann Musterlösung aufdecken</div>
@@ -513,7 +534,6 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
   </div>
 
   <!-- Aufgabe 1 -->
-
   <div class="task-box">
     <div class="task-head">
       <div class="task-num" style="background:var(--bl);">1</div>
@@ -536,13 +556,12 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
     <button class="exp-btn" onclick="tog(this)"><span>✅ Musterlösung aufdecken</span><span class="arr">▾</span></button>
     <div class="exp-body">
       <p>Die wehrhafte Demokratie bezeichnet das im Grundgesetz verankerte Konzept, nach dem der demokratische Staat das Recht hat, sich gegen Bestrebungen zu wehren, die die freiheitlich-demokratische Grundordnung beseitigen wollen. Das Konzept entstand als Reaktion auf das Scheitern der Weimarer Republik, deren Demokratie ihre Feinde nicht aufhalten konnte.</p>
-      <p>Ein Parteiverbot nach Art. 21 Abs. 2 GG setzt zwei Voraussetzungen voraus: Erstens muss die Partei verfassungsfeindlich sein, d.h. sie muss darauf ausgehen, die fdGO zu beeinträchtigen oder zu beseitigen. Zweitens muss von ihr ein konkretes Gefährdungspotenzial ausgehen.</p>
+      <p>Ein Parteiverbot nach Art. 21 Abs. 2 GG setzt zwei kumulative Voraussetzungen voraus: Erstens muss die Partei verfassungsfeindlich sein, d.h. sie muss darauf ausgehen, die fdGO zu beeinträchtigen oder zu beseitigen. Zweitens muss von ihr ein konkretes Gefährdungspotenzial ausgehen.</p>
       <p>Die NPD erfüllte das erste Kriterium: Das BVerfG stellte 2017 ausdrücklich fest, dass sie verfassungsfeindlich ist, sich am Nationalsozialismus orientiert und antisemitisch agiert. Das zweite Kriterium war jedoch nicht erfüllt: Die NPD erzielte weniger als ein Prozent bei Bundestagswahlen und war zu bedeutungslos, um die Demokratie ernsthaft zu bedrohen. Da ein Parteiverbot das schärfste Mittel der wehrhaften Demokratie darstellt, darf es nur als letztes Mittel eingesetzt werden – und das setzt ein reales Gefährdungspotenzial voraus.</p>
     </div>
   </div>
 
   <!-- Aufgabe 2 -->
-
   <div class="task-box">
     <div class="task-head">
       <div class="task-num" style="background:var(--go);">2</div>
@@ -574,7 +593,6 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
   </div>
 
   <!-- Aufgabe 3 -->
-
   <div class="task-box">
     <div class="task-head">
       <div class="task-num" style="background:var(--pu);">3</div>
@@ -587,17 +605,30 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
     </div>
     <button class="exp-btn" onclick="tog(this)"><span>📌 Strukturhilfe</span><span class="arr">▾</span></button>
     <div class="exp-body">
-      <table class="tbl">
+      <div style="background:#1a1a1a;color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px;padding:5px 10px;border-radius:4px 4px 0 0;">── EINLEITUNG</div>
+      <table class="tbl" style="margin-top:0;">
+        <thead><tr><th>Schritt</th><th>Inhalt</th><th>Sätze</th></tr></thead>
+        <tbody><tr><td>Einstieg</td><td>Problem benennen</td><td>1–2</td></tr></tbody>
+      </table>
+      <div style="background:#1a1a1a;color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px;padding:5px 10px;margin-top:6px;">── HAUPTTEIL</div>
+      <table class="tbl" style="margin-top:0;">
         <thead><tr><th>Schritt</th><th>Inhalt</th><th>Sätze</th></tr></thead>
         <tbody>
-          <tr><td>Einstieg</td><td>Problem benennen</td><td>1–2</td></tr>
           <tr><td>Legitimität</td><td>„Im Hinblick auf Legitimität..."</td><td>3–4</td></tr>
           <tr><td>Effizienz</td><td>„Im Hinblick auf Effizienz..."</td><td>3–4</td></tr>
           <tr><td>Gegenargument</td><td>„Kritiker/Befürworter hingegen..."</td><td>1–2</td></tr>
           <tr><td>2024 einbeziehen</td><td>Finanzierungsausschluss als Weiterentwicklung</td><td>2</td></tr>
-          <tr><td><strong>Fazit</strong></td><td>„Abwägend lässt sich urteilen..."</td><td>2</td></tr>
         </tbody>
       </table>
+      <div style="background:#1a1a1a;color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px;padding:5px 10px;margin-top:6px;border-radius:0 0 0 0;">── FAZIT</div>
+      <table class="tbl" style="margin-top:0;">
+        <thead><tr><th>Schritt</th><th>Inhalt</th><th>Sätze</th></tr></thead>
+        <tbody><tr><td><strong>Fazit</strong></td><td>„Abwägend lässt sich urteilen..."</td><td>2</td></tr></tbody>
+      </table>
+      <div style="margin-top:10px;padding:8px 12px;background:#f8f8f8;border:1px solid var(--border);
+        border-radius:6px;font-size:13px;color:var(--light);">
+        ⚠️ <strong>Darstellungsleistung:</strong> Vollständige Sätze · Präsens · korrekte Rechtschreibung · logischer Aufbau
+      </div>
     </div>
     <button class="exp-btn" onclick="tog(this)"><span>✅ Musterlösung aufdecken</span><span class="arr">▾</span></button>
     <div class="exp-body">
@@ -615,13 +646,11 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
 <!-- ══════════════════════════════
      7. SELBSTCHECK
 ══════════════════════════════ -->
-
 <div class="panel" id="panel-check">
   <div class="sec-title">Selbstcheck</div>
   <div class="sec-sub">Wie gut kennst du das Thema? Wähle für jedes Thema ehrlich deine Ampelfarbe.</div>
 
   <!-- Übersicht -->
-
   <div class="card" id="ampel-summary-card">
     <div class="card-title">🚦 Deine Ampel auf einen Blick</div>
     <div id="summary-rows">
@@ -633,7 +662,6 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
   </div>
 
   <!-- Rechtsextremismus -->
-
   <div class="ampel-card">
     <div class="ampel-header">
       <span style="font-size:20px;">🔴</span>
@@ -653,7 +681,6 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
   </div>
 
   <!-- Wehrhafte Demokratie -->
-
   <div class="ampel-card">
     <div class="ampel-header">
       <span style="font-size:20px;">🟣</span>
@@ -673,7 +700,6 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
   </div>
 
   <!-- Parteiverbot -->
-
   <div class="ampel-card">
     <div class="ampel-header">
       <span style="font-size:20px;">🔵</span>
@@ -693,7 +719,6 @@ padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.7;}
   </div>
 
   <!-- Effizienz & Legitimität -->
-
   <div class="ampel-card">
     <div class="ampel-header">
       <span style="font-size:20px;">🟡</span>
@@ -839,6 +864,5 @@ function setAmpel(thema, farbe, btn) {
 
 buildFC();
 </script>
-
 </body>
 </html>
